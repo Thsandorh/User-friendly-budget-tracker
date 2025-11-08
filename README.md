@@ -295,9 +295,9 @@ npx prisma migrate dev
 - [x] Data export (CSV, PDF)
 - [x] Dark mode
 - [x] Progressive Web App (PWA)
-- [ ] Budget alerts and notifications
-- [ ] Email notifications
-- [ ] Mobile app companion
+- [x] Budget alerts and notifications
+- [x] Email notifications
+- [x] Mobile app companion
 
 ## Contributing
 
