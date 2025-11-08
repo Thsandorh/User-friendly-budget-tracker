@@ -254,6 +254,22 @@
     "thisMonth": "Ebben a hónapban",
     "bills": "számla"
   },
+  "subscriptions": {
+    "title": "Előfizetések",
+    "subtitle": "Kezeld az ismétlődő előfizetéseket",
+    "addSubscription": "Előfizetés hozzáadása",
+    "activeSubscriptions": "Aktív előfizetések",
+    "monthlyTotal": "Havi összeg",
+    "yearlyTotal": "Éves összeg",
+    "perMonth": "havonta",
+    "perYear": "évente",
+    "month": "hónap",
+    "total": "összesen",
+    "nextBilling": "Következő fizetés",
+    "noSubscriptions": "Még nincsenek aktív előfizetések",
+    "savingsTip": "Megtakarítási tipp",
+    "savingsTipDescription": "{monthly} forintot költesz havonta előfizetésekre ({yearly} évente). Fontolja meg a nem használt előfizetések lemondását."
+  },
   "settings": {
     "title": "Beállítások",
     "profile": "Profil",

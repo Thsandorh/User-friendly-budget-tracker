@@ -249,6 +249,22 @@
     "thisMonth": "This Month",
     "bills": "bills"
   },
+  "subscriptions": {
+    "title": "Subscriptions",
+    "subtitle": "Manage your recurring subscriptions",
+    "addSubscription": "Add Subscription",
+    "activeSubscriptions": "Active Subscriptions",
+    "monthlyTotal": "Monthly Total",
+    "yearlyTotal": "Yearly Total",
+    "perMonth": "per month",
+    "perYear": "per year",
+    "month": "month",
+    "total": "total",
+    "nextBilling": "Next billing",
+    "noSubscriptions": "No active subscriptions yet",
+    "savingsTip": "Savings Tip",
+    "savingsTipDescription": "You're spending {monthly} per month on subscriptions ({yearly} per year). Consider reviewing and canceling unused subscriptions."
+  },
   "settings": {
     "title": "Settings",
     "profile": "Profile",

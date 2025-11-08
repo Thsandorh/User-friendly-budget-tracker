@@ -14,6 +14,7 @@ import {
   FileText,
   Target,
   Receipt,
+  Tv,
   Settings,
   LogOut,
   Menu,
@@ -80,6 +81,12 @@ export function DashboardNav({ locale }: DashboardNavProps) {
       icon: Receipt,
       href: `/${locale}/bills`,
       active: pathname?.startsWith(`/${locale}/bills`),
+    },
+    {
+      label: t("subscriptions.title"),
+      icon: Tv,
+      href: `/${locale}/subscriptions`,
+      active: pathname?.startsWith(`/${locale}/subscriptions`),
     },
   ]
 
