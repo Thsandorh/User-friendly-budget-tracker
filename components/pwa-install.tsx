@@ -14,6 +14,7 @@ export function PWAInstall() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
   const [showInstallPrompt, setShowInstallPrompt] = useState(false)
   const [isSupported, setIsSupported] = useState(false)
+  const [showManualButton, setShowManualButton] = useState(false)
 
   useEffect(() => {
     console.log('[PWA] Component mounted')
@@ -81,6 +82,12 @@ export function PWAInstall() {
         console.warn('  2. PWA criteria not met (HTTPS, manifest, service worker)')
         console.warn('  3. Browser does not support PWA installation')
         console.warn('  4. User has already dismissed install prompt too many times')
+        // Show manual button after 10 seconds if supported but not shown
+        setTimeout(() => {
+          if (deferredPrompt && !showInstallPrompt) {
+            setShowManualButton(true)
+          }
+        }, 5000)
       }
     }, 5000)
 
@@ -156,6 +163,21 @@ export function PWAInstall() {
           </CardContent>
         </Card>
       </div>
+    )
+  }
+
+  // Manual install button - show if PWA is installable but prompt is not shown
+  if (deferredPrompt && !showInstallPrompt) {
+    return (
+      <Button
+        onClick={handleInstallClick}
+        className="fixed bottom-20 right-4 z-50 shadow-lg"
+        size="lg"
+        title="Install App"
+      >
+        <Download className="mr-2 h-5 w-5" />
+        Install App
+      </Button>
     )
   }
 
