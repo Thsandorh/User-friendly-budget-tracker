@@ -2,6 +2,7 @@
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { ensureDatabaseSchema } from "@/lib/auto-migrate"
 import { useTranslations } from "next-intl"
 import { getTranslations } from "next-intl/server"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -16,6 +17,9 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
   if (!session?.user?.id) {
     return null
   }
+
+  // Ensure database schema is up to date
+  await ensureDatabaseSchema()
 
   // Get current month start and end dates
   const now = new Date()

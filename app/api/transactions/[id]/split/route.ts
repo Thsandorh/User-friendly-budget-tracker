@@ -3,6 +3,7 @@ import { NextResponse } from "next/server"
 import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { ensureDatabaseSchema } from "@/lib/auto-migrate"
 
 interface SplitItem {
   categoryId: string
@@ -20,6 +21,8 @@ export async function POST(
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    await ensureDatabaseSchema()
 
     const { splits }: { splits: SplitItem[] } = await req.json()
 
@@ -81,6 +84,8 @@ export async function GET(
     if (!session?.user?.id) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
+
+    await ensureDatabaseSchema()
 
     const splits = await db.transaction.findMany({
       where: {
