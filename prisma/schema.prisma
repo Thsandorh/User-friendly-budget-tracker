@@ -1,0 +1,121 @@
+// This is your Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// User model for authentication
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String
+  name          String
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  // Relations
+  budgets       Budget[]
+  transactions  Transaction[]
+  categories    Category[]
+  recurringTransactions RecurringTransaction[]
+}
+
+// Budget model - users can have multiple budgets
+model Budget {
+  id          String   @id @default(cuid())
+  name        String
+  amount      Float
+  currency    String   @default("HUF")
+  period      String   // "monthly", "weekly", "yearly"
+  startDate   DateTime
+  endDate     DateTime?
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Relations
+  transactions Transaction[]
+  categories   Category[]
+}
+
+// Category model for organizing transactions
+model Category {
+  id          String   @id @default(cuid())
+  name        String
+  icon        String   @default("📁")
+  color       String   @default("#3b82f6")
+  type        String   // "expense" or "income"
+  budgetLimit Float?   // Optional budget limit for this category
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  budgetId    String?
+  budget      Budget?  @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+
+  // Relations
+  transactions Transaction[]
+  recurringTransactions RecurringTransaction[]
+}
+
+// Transaction model - income and expenses
+model Transaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  description String
+  type        String   // "income" or "expense"
+  date        DateTime
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  budgetId    String?
+  budget      Budget?  @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  recurringTransactionId String?
+  recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+}
+
+// Recurring transaction model for automatic transactions
+model RecurringTransaction {
+  id          String   @id @default(cuid())
+  amount      Float
+  description String
+  type        String   // "income" or "expense"
+  frequency   String   // "daily", "weekly", "monthly", "yearly"
+  startDate   DateTime
+  endDate     DateTime?
+  dayOfMonth  Int?     // For monthly transactions (1-31)
+  dayOfWeek   Int?     // For weekly transactions (0-6)
+  isActive    Boolean  @default(true)
+  lastProcessed DateTime?
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  // Relations
+  transactions Transaction[]
+}
