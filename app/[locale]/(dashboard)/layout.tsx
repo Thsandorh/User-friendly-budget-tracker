@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { authOptions } from "@/lib/auth"
 import { DashboardNav } from "@/components/dashboard-nav"
 import { LanguageSwitcher } from "@/components/language-switcher"
+import { ThemeToggle } from "@/components/theme-toggle"
 
 export default async function DashboardLayout({
   children,
@@ -23,7 +24,8 @@ export default async function DashboardLayout({
       <DashboardNav locale={locale} />
       <div className="md:pl-64">
         <div className="container mx-auto p-6">
-          <div className="flex justify-end mb-4">
+          <div className="flex justify-end gap-2 mb-4">
+            <ThemeToggle />
             <LanguageSwitcher />
           </div>
           {children}

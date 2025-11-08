@@ -1,0 +1,28 @@
+{
+  "name": "Budget Tracker - Költségvetés Követő",
+  "short_name": "Budget Tracker",
+  "description": "Professional budget tracking application with Hungarian and English language support",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["finance", "productivity"],
+  "lang": "hu-HU",
+  "dir": "ltr",
+  "prefer_related_applications": false
+}
