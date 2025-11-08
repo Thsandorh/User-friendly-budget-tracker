@@ -283,6 +283,7 @@ npx prisma migrate dev
 
 ## Features Roadmap
 
+### ✅ Implemented Features
 - [x] User authentication
 - [x] Budget management
 - [x] Transaction tracking
@@ -295,9 +296,11 @@ npx prisma migrate dev
 - [x] Data export (CSV, PDF)
 - [x] Dark mode
 - [x] Progressive Web App (PWA)
-- [x] Budget alerts and notifications
-- [x] Email notifications
-- [x] Mobile app companion
+
+### 🔮 Future Enhancements
+- [ ] Budget alerts and notifications
+- [ ] Email notifications
+- [ ] Mobile app companion (native iOS/Android)
 
 ## Contributing
 
