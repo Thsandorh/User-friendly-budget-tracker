@@ -55,32 +55,3 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Failed to create rule" }, { status: 500 })
   }
 }
-
-// Helper function to find matching category based on rules
-export async function findMatchingCategory(
-  userId: string,
-  description: string
-): Promise<string | null> {
-  try {
-    const rules = await db.categorizationRule.findMany({
-      where: {
-        userId,
-        isActive: true,
-      },
-      orderBy: [{ priority: 'desc' }, { createdAt: 'desc' }],
-    })
-
-    const lowerDescription = description.toLowerCase()
-
-    for (const rule of rules) {
-      if (lowerDescription.includes(rule.pattern.toLowerCase())) {
-        return rule.categoryId
-      }
-    }
-
-    return null
-  } catch (error) {
-    console.error("Error finding matching category:", error)
-    return null
-  }
-}
