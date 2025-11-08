@@ -5,7 +5,8 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Filter } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Plus, Filter, Search } from "lucide-react"
 import { formatCurrency, formatDateShort } from "@/lib/utils"
 import { TransactionDialog } from "@/components/transaction-dialog"
 import { useToast } from "@/components/ui/use-toast"
@@ -27,6 +28,7 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
   const [editingTransaction, setEditingTransaction] = useState<any>(null)
   const [filterType, setFilterType] = useState<string>("all")
   const [filterCategory, setFilterCategory] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
   useEffect(() => {
     fetchTransactions()
@@ -90,6 +92,18 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
     fetchTransactions()
   }
 
+  // Filter transactions based on search query
+  const filteredTransactions = transactions.filter(transaction => {
+    if (!searchQuery) return true
+
+    const query = searchQuery.toLowerCase()
+    const description = transaction.description.toLowerCase()
+    const amount = transaction.amount.toString()
+    const notes = transaction.notes?.toLowerCase() || ""
+
+    return description.includes(query) || amount.includes(query) || notes.includes(query)
+  })
+
   if (isLoading) {
     return <div className="flex items-center justify-center h-64">{t("common.loading")}</div>
   }
@@ -107,32 +121,43 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
         </Button>
       </div>
 
-      {/* Filters */}
+      {/* Filters and Search */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex gap-4 items-center">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder={t("transactions.filterByType")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("transactions.all")}</SelectItem>
-                <SelectItem value="income">{t("transactions.income")}</SelectItem>
-                <SelectItem value="expense">{t("transactions.expense")}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder={t("transactions.filterByCategory")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("transactions.all")}</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2 flex-1">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <div className="flex gap-2 items-center">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder={t("transactions.filterByType")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("transactions.all")}</SelectItem>
+                  <SelectItem value="income">{t("transactions.income")}</SelectItem>
+                  <SelectItem value="expense">{t("transactions.expense")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder={t("transactions.filterByCategory")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("transactions.all")}</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -140,14 +165,20 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
       {/* Transactions list */}
       <Card>
         <CardContent className="pt-6">
-          {transactions.length === 0 ? (
+          {filteredTransactions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>{t("dashboard.noTransactions")}</p>
-              <p className="text-sm">{t("dashboard.addFirstTransaction")}</p>
+              {transactions.length === 0 ? (
+                <>
+                  <p>{t("dashboard.noTransactions")}</p>
+                  <p className="text-sm">{t("dashboard.addFirstTransaction")}</p>
+                </>
+              ) : (
+                <p>No transactions match your search</p>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
-              {transactions.map((transaction) => (
+              {filteredTransactions.map((transaction) => (
                 <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
                   <div className="flex items-center gap-4">
                     <div className={`w-3 h-3 rounded-full ${
