@@ -376,6 +376,31 @@ export async function ensureDatabaseSchema() {
         END $$
       `)
 
+      // Add new columns to existing tables if they don't exist
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'Transaction' AND column_name = 'parentTransactionId'
+          ) THEN
+            ALTER TABLE "Transaction" ADD COLUMN "parentTransactionId" TEXT;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = 'Transaction' AND column_name = 'splitPercentage'
+          ) THEN
+            ALTER TABLE "Transaction" ADD COLUMN "splitPercentage" DOUBLE PRECISION;
+          END IF;
+        END $$
+      `)
+
       console.log("✅ Database tables created successfully!")
       schemaEnsured = true
     } catch (err) {
