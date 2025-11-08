@@ -211,10 +211,35 @@ export async function ensureDatabaseSchema() {
       `)
     } // End of !tablesExist block
 
-    // ALWAYS run foreign keys and ALTER TABLE commands (they have IF NOT EXISTS logic)
-    console.log("🔧 Ensuring foreign keys and new columns...")
+    // ALWAYS run ALTER TABLE commands (they have IF NOT EXISTS logic)
+    console.log("🔧 Ensuring new columns and foreign keys...")
 
-    // Add foreign keys - each in a separate transaction-safe block
+    // STEP 1: Add new columns FIRST (before foreign keys that reference them)
+    await db.$executeRawUnsafe(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'Transaction' AND column_name = 'parentTransactionId'
+        ) THEN
+          ALTER TABLE "Transaction" ADD COLUMN "parentTransactionId" TEXT;
+        END IF;
+      END $$
+    `)
+
+    await db.$executeRawUnsafe(`
+      DO $$
+      BEGIN
+        IF NOT EXISTS (
+          SELECT 1 FROM information_schema.columns
+          WHERE table_name = 'Transaction' AND column_name = 'splitPercentage'
+        ) THEN
+          ALTER TABLE "Transaction" ADD COLUMN "splitPercentage" DOUBLE PRECISION;
+        END IF;
+      END $$
+    `)
+
+    // STEP 2: Add foreign keys - each in a separate transaction-safe block
       await db.$executeRawUnsafe(`
         DO $$
         BEGIN
@@ -381,31 +406,6 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CategorizationRule_userId_fkey') THEN
             ALTER TABLE "CategorizationRule" ADD CONSTRAINT "CategorizationRule_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-          END IF;
-        END $$
-      `)
-
-      // Add new columns to existing tables if they don't exist
-      await db.$executeRawUnsafe(`
-        DO $$
-        BEGIN
-          IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name = 'Transaction' AND column_name = 'parentTransactionId'
-          ) THEN
-            ALTER TABLE "Transaction" ADD COLUMN "parentTransactionId" TEXT;
-          END IF;
-        END $$
-      `)
-
-      await db.$executeRawUnsafe(`
-        DO $$
-        BEGIN
-          IF NOT EXISTS (
-            SELECT 1 FROM information_schema.columns
-            WHERE table_name = 'Transaction' AND column_name = 'splitPercentage'
-          ) THEN
-            ALTER TABLE "Transaction" ADD COLUMN "splitPercentage" DOUBLE PRECISION;
           END IF;
         END $$
       `)
