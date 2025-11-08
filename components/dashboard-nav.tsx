@@ -13,6 +13,7 @@ import {
   RepeatIcon,
   FileText,
   Target,
+  Receipt,
   Settings,
   LogOut,
   Menu,
@@ -73,6 +74,12 @@ export function DashboardNav({ locale }: DashboardNavProps) {
       icon: Target,
       href: `/${locale}/goals`,
       active: pathname?.startsWith(`/${locale}/goals`),
+    },
+    {
+      label: t("bills.title"),
+      icon: Receipt,
+      href: `/${locale}/bills`,
+      active: pathname?.startsWith(`/${locale}/bills`),
     },
   ]
 
