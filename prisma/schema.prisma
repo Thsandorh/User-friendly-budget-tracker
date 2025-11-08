@@ -25,6 +25,7 @@ model User {
   categories    Category[]
   recurringTransactions RecurringTransaction[]
   savingsGoals  SavingsGoal[]
+  billReminders BillReminder[]
 }
 
 // Budget model - users can have multiple budgets
@@ -68,6 +69,7 @@ model Category {
   // Relations
   transactions Transaction[]
   recurringTransactions RecurringTransaction[]
+  billReminders BillReminder[]
 }
 
 // Transaction model - income and expenses
@@ -138,4 +140,25 @@ model SavingsGoal {
 
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Bill Reminder model - track upcoming bills and payment reminders
+model BillReminder {
+  id          String   @id @default(cuid())
+  name        String
+  amount      Float
+  currency    String   @default("HUF")
+  dueDate     DateTime
+  isPaid      Boolean  @default(false)
+  isRecurring Boolean  @default(false)
+  frequency   String?  // "monthly", "quarterly", "yearly" if recurring
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 }

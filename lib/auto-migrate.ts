@@ -123,6 +123,25 @@ export async function ensureDatabaseSchema() {
         )
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "BillReminder" (
+          "id" TEXT NOT NULL,
+          "name" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'HUF',
+          "dueDate" TIMESTAMP(3) NOT NULL,
+          "isPaid" BOOLEAN NOT NULL DEFAULT false,
+          "isRecurring" BOOLEAN NOT NULL DEFAULT false,
+          "frequency" TEXT,
+          "notes" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          "categoryId" TEXT,
+          CONSTRAINT "BillReminder_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
       // Add foreign keys - each in a separate transaction-safe block
       await db.$executeRawUnsafe(`
         DO $$
@@ -220,6 +239,26 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SavingsGoal_userId_fkey') THEN
             ALTER TABLE "SavingsGoal" ADD CONSTRAINT "SavingsGoal_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BillReminder_userId_fkey') THEN
+            ALTER TABLE "BillReminder" ADD CONSTRAINT "BillReminder_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BillReminder_categoryId_fkey') THEN
+            ALTER TABLE "BillReminder" ADD CONSTRAINT "BillReminder_categoryId_fkey"
+            FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
           END IF;
         END $$
       `)
