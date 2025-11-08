@@ -11,13 +11,22 @@ A full-featured budget tracking web application built with Next.js 14, TypeScrip
 - 🏷️ Category management with custom icons and colors
 - 📊 Dashboard with financial overview and analytics
 - 🔄 Recurring transactions (daily, weekly, monthly, yearly)
-- 📈 Advanced reports with interactive charts
+- 📈 Advanced reports with interactive charts (Donut, Bar, Area, Radial, Composed)
 - 📥 Data export (CSV and PDF)
+- 🔍 Transaction search and filtering
+- 📊 Budget alerts (80% warning, 100% exceeded)
+- 📈 Month-over-month statistics
 - 🌙 Dark mode with theme switching
 - 📱 Progressive Web App (PWA) with offline support
 - 🌍 Multi-language support (Hungarian and English)
 - 📱 Fully responsive design
 - 🎨 Professional UI with Tailwind CSS and shadcn/ui
+
+💎 **Premium Features:**
+- 🎯 **Savings Goals** - Track progress toward financial targets with visual progress bars
+- 📋 **Bill Reminders** - Never miss a payment with due date tracking and overdue alerts
+- 📺 **Subscription Tracker** - Manage recurring subscriptions with monthly/yearly cost analysis
+- 💎 **Net Worth Tracking** - Track your assets and liabilities for complete financial overview
 
 ## Tech Stack
 
