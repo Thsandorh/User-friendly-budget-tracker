@@ -24,6 +24,7 @@ model User {
   transactions  Transaction[]
   categories    Category[]
   recurringTransactions RecurringTransaction[]
+  savingsGoals  SavingsGoal[]
 }
 
 // Budget model - users can have multiple budgets
@@ -118,4 +119,23 @@ model RecurringTransaction {
 
   // Relations
   transactions Transaction[]
+}
+
+// Savings Goal model - track savings towards specific goals
+model SavingsGoal {
+  id          String   @id @default(cuid())
+  name        String
+  targetAmount Float
+  currentAmount Float   @default(0)
+  currency    String   @default("HUF")
+  deadline    DateTime?
+  icon        String   @default("🎯")
+  color       String   @default("#10b981")
+  isCompleted Boolean  @default(false)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

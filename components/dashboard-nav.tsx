@@ -12,6 +12,7 @@ import {
   Tags,
   RepeatIcon,
   FileText,
+  Target,
   Settings,
   LogOut,
   Menu,
@@ -66,6 +67,12 @@ export function DashboardNav({ locale }: DashboardNavProps) {
       icon: FileText,
       href: `/${locale}/reports`,
       active: pathname?.startsWith(`/${locale}/reports`),
+    },
+    {
+      label: t("goals.title"),
+      icon: Target,
+      href: `/${locale}/goals`,
+      active: pathname?.startsWith(`/${locale}/goals`),
     },
   ]
 
