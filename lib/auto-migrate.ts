@@ -142,6 +142,39 @@ export async function ensureDatabaseSchema() {
         )
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "Asset" (
+          "id" TEXT NOT NULL,
+          "name" TEXT NOT NULL,
+          "type" TEXT NOT NULL,
+          "value" DOUBLE PRECISION NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'HUF',
+          "icon" TEXT NOT NULL DEFAULT '💰',
+          "notes" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "Asset_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "Liability" (
+          "id" TEXT NOT NULL,
+          "name" TEXT NOT NULL,
+          "type" TEXT NOT NULL,
+          "balance" DOUBLE PRECISION NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'HUF',
+          "interestRate" DOUBLE PRECISION,
+          "icon" TEXT NOT NULL DEFAULT '💳',
+          "notes" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "Liability_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
       // Add foreign keys - each in a separate transaction-safe block
       await db.$executeRawUnsafe(`
         DO $$
@@ -259,6 +292,26 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'BillReminder_categoryId_fkey') THEN
             ALTER TABLE "BillReminder" ADD CONSTRAINT "BillReminder_categoryId_fkey"
             FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Asset_userId_fkey') THEN
+            ALTER TABLE "Asset" ADD CONSTRAINT "Asset_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Liability_userId_fkey') THEN
+            ALTER TABLE "Liability" ADD CONSTRAINT "Liability_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
       `)
