@@ -6,9 +6,10 @@ import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
-import { Plus, Filter, Search } from "lucide-react"
+import { Plus, Filter, Search, Camera } from "lucide-react"
 import { formatCurrency, formatDateShort } from "@/lib/utils"
 import { TransactionDialog } from "@/components/transaction-dialog"
+import { ReceiptScanner } from "@/components/receipt-scanner"
 import { useToast } from "@/components/ui/use-toast"
 import {
   Select,
@@ -25,6 +26,7 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
   const [categories, setCategories] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<any>(null)
   const [filterType, setFilterType] = useState<string>("all")
   const [filterCategory, setFilterCategory] = useState<string>("all")
@@ -92,6 +94,11 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
     fetchTransactions()
   }
 
+  const handleReceiptScanSuccess = () => {
+    setIsReceiptScannerOpen(false)
+    fetchTransactions()
+  }
+
   // Filter transactions based on search query
   const filteredTransactions = transactions.filter(transaction => {
     if (!searchQuery) return true
@@ -115,10 +122,16 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
           <h1 className="text-3xl font-bold">{t("transactions.title")}</h1>
           <p className="text-muted-foreground">Track your income and expenses</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
-          <Plus className="mr-2 h-4 w-4" />
-          {t("transactions.addTransaction")}
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button onClick={() => setIsReceiptScannerOpen(!isReceiptScannerOpen)} variant="outline" className="flex-1 sm:flex-none">
+            <Camera className="mr-2 h-4 w-4" />
+            Scan Receipt
+          </Button>
+          <Button onClick={() => setIsDialogOpen(true)} className="flex-1 sm:flex-none">
+            <Plus className="mr-2 h-4 w-4" />
+            {t("transactions.addTransaction")}
+          </Button>
+        </div>
       </div>
 
       {/* Filters and Search */}
@@ -161,6 +174,14 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
           </div>
         </CardContent>
       </Card>
+
+      {/* Receipt Scanner */}
+      {isReceiptScannerOpen && (
+        <ReceiptScanner
+          categories={categories}
+          onSuccess={handleReceiptScanSuccess}
+        />
+      )}
 
       {/* Transactions list */}
       <Card>
