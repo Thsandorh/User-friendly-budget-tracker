@@ -78,6 +78,8 @@ export async function ensureDatabaseSchema() {
           "budgetId" TEXT,
           "categoryId" TEXT,
           "recurringTransactionId" TEXT,
+          "parentTransactionId" TEXT,
+          "splitPercentage" DOUBLE PRECISION,
           CONSTRAINT "Transaction_pkey" PRIMARY KEY ("id")
         )
       `)
@@ -242,6 +244,16 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Transaction_recurringTransactionId_fkey') THEN
             ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_recurringTransactionId_fkey"
             FOREIGN KEY ("recurringTransactionId") REFERENCES "RecurringTransaction"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'Transaction_parentTransactionId_fkey') THEN
+            ALTER TABLE "Transaction" ADD CONSTRAINT "Transaction_parentTransactionId_fkey"
+            FOREIGN KEY ("parentTransactionId") REFERENCES "Transaction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
       `)
