@@ -1,17 +1,16 @@
 // Automatic database migration on first request
 import { db } from "./db"
 
-let migrationAttempted = false
+let schemaEnsured = false
 
 export async function ensureDatabaseSchema() {
-  // Only try once per server instance
-  if (migrationAttempted) return
-
-  migrationAttempted = true
+  // If already ensured successfully, skip
+  if (schemaEnsured) return
 
   try {
     // Check if User table exists
     await db.user.findFirst()
+    schemaEnsured = true
     console.log("✅ Database schema already exists")
   } catch (error) {
     console.log("⚠️  Database tables not found, creating them...")
@@ -149,8 +148,10 @@ export async function ensureDatabaseSchema() {
       `)
 
       console.log("✅ Database tables created successfully!")
+      schemaEnsured = true
     } catch (err) {
       console.error("❌ Failed to create database tables:", err)
+      throw err // Re-throw to let caller know it failed
     }
   }
 }
