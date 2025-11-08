@@ -28,6 +28,8 @@ model User {
   billReminders BillReminder[]
   assets        Asset[]
   liabilities   Liability[]
+  budgetTemplates BudgetTemplate[]
+  categorizationRules CategorizationRule[]
 }
 
 // Budget model - users can have multiple budgets
@@ -197,6 +199,34 @@ model Liability {
   interestRate Float?
   icon        String   @default("💳")
   notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Budget Template - predefined budget templates (50/30/20 rule, etc.)
+model BudgetTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  categories  Json     // Array of {category, percentage}
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String?
+  user        User?    @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Categorization Rule - auto-categorize transactions based on patterns
+model CategorizationRule {
+  id          String   @id @default(cuid())
+  pattern     String   // Text pattern to match in description
+  categoryId  String
+  priority    Int      @default(0)
+  isActive    Boolean  @default(true)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
