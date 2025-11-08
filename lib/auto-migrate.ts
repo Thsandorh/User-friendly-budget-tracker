@@ -7,15 +7,20 @@ export async function ensureDatabaseSchema() {
   // If already ensured successfully, skip
   if (schemaEnsured) return
 
+  let tablesExist = false
+
   try {
     // Check if User table exists
     await db.user.findFirst()
-    schemaEnsured = true
-    console.log("✅ Database schema already exists")
+    tablesExist = true
+    console.log("✅ Database tables already exist, checking for new columns...")
   } catch (error) {
     console.log("⚠️  Database tables not found, creating them...")
+  }
 
-    try {
+  try {
+    // Only create tables if they don't exist
+    if (!tablesExist) {
       // Create tables using raw SQL - each statement separately
       await db.$executeRawUnsafe(`
         CREATE TABLE IF NOT EXISTS "User" (
@@ -204,8 +209,12 @@ export async function ensureDatabaseSchema() {
           CONSTRAINT "CategorizationRule_pkey" PRIMARY KEY ("id")
         )
       `)
+    } // End of !tablesExist block
 
-      // Add foreign keys - each in a separate transaction-safe block
+    // ALWAYS run foreign keys and ALTER TABLE commands (they have IF NOT EXISTS logic)
+    console.log("🔧 Ensuring foreign keys and new columns...")
+
+    // Add foreign keys - each in a separate transaction-safe block
       await db.$executeRawUnsafe(`
         DO $$
         BEGIN
@@ -401,11 +410,10 @@ export async function ensureDatabaseSchema() {
         END $$
       `)
 
-      console.log("✅ Database tables created successfully!")
-      schemaEnsured = true
-    } catch (err) {
-      console.error("❌ Failed to create database tables:", err)
-      throw err // Re-throw to let caller know it failed
-    }
+    console.log("✅ Database schema ensured successfully!")
+    schemaEnsured = true
+  } catch (err) {
+    console.error("❌ Failed to ensure database schema:", err)
+    throw err // Re-throw to let caller know it failed
   }
 }
