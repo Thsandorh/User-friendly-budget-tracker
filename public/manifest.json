@@ -1,8 +1,9 @@
 {
   "name": "Budget Tracker - Költségvetés Követő",
   "short_name": "Budget Tracker",
-  "description": "Professional budget tracking application with Hungarian and English language support",
+  "description": "Professional budget tracking application with Hungarian and English language support. Track expenses, scan receipts with OCR, and manage your budget offline.",
   "start_url": "/",
+  "scope": "/",
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#3b82f6",
@@ -19,10 +20,27 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any"
     }
   ],
+  "screenshots": [],
   "categories": ["finance", "productivity"],
   "lang": "hu-HU",
   "dir": "ltr",
-  "prefer_related_applications": false
+  "prefer_related_applications": false,
+  "related_applications": [],
+  "shortcuts": [
+    {
+      "name": "Add Transaction",
+      "short_name": "Add",
+      "description": "Quickly add a new transaction",
+      "url": "/hu/transactions",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
 }
