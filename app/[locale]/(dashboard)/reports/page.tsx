@@ -254,10 +254,8 @@ export default function ReportsPage({ params: { locale } }: { params: { locale: 
                 }).filter(item => item.value > 0)}
               >
                 <RadialBar
-                  minAngle={15}
                   label={{ position: 'insideStart', fill: '#fff', fontSize: 12 }}
                   background
-                  clockWise
                   dataKey="value"
                   animationBegin={0}
                   animationDuration={800}
