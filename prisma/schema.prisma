@@ -96,6 +96,12 @@ model Transaction {
 
   recurringTransactionId String?
   recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+
+  // Split transaction support
+  parentTransactionId String?
+  parentTransaction   Transaction? @relation("SplitTransactions", fields: [parentTransactionId], references: [id], onDelete: Cascade)
+  splitTransactions   Transaction[] @relation("SplitTransactions")
+  splitPercentage     Float?
 }
 
 // Recurring transaction model for automatic transactions
