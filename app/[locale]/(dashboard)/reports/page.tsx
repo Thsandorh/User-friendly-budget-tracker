@@ -138,17 +138,17 @@ export default function ReportsPage({ params: { locale } }: { params: { locale: 
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t("reports.title")}</h1>
           <p className="text-muted-foreground">View detailed financial reports and analytics</p>
         </div>
-        <div className="flex gap-2">
-          <Button onClick={handleExportCSV} variant="outline">
+        <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+          <Button onClick={handleExportCSV} variant="outline" className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             {t("reports.exportToCsv")}
           </Button>
-          <Button onClick={handleExportPDF}>
+          <Button onClick={handleExportPDF} className="w-full sm:w-auto">
             <Download className="mr-2 h-4 w-4" />
             {t("reports.exportToPdf")}
           </Button>
