@@ -23,10 +23,14 @@ A full-featured budget tracking web application built with Next.js 14, TypeScrip
 - 🎨 Professional UI with Tailwind CSS and shadcn/ui
 
 💎 **Premium Features:**
-- 🎯 **Savings Goals** - Track progress toward financial targets with visual progress bars
-- 📋 **Bill Reminders** - Never miss a payment with due date tracking and overdue alerts
-- 📺 **Subscription Tracker** - Manage recurring subscriptions with monthly/yearly cost analysis
-- 💎 **Net Worth Tracking** - Track your assets and liabilities for complete financial overview
+- 🎯 **Savings Goals** - Track progress toward financial targets with visual progress bars, deadlines, and quick contributions
+- 📋 **Bill Reminders** - Never miss a payment with due date tracking, overdue alerts, recurring bills, and status management
+- 📺 **Subscription Tracker** - Manage recurring subscriptions with monthly/yearly cost analysis, next billing dates, and savings tips
+- 💎 **Net Worth Tracking** - Track your assets and liabilities for complete financial overview with real-time net worth calculation
+- ✂️ **Split Transactions** - Divide a single transaction across multiple categories with percentage-based allocation
+- 📋 **Budget Templates** - Quick-start with proven strategies (50/30/20 Rule, 70/20/10, Zero-Based Budget) or create custom templates
+- 🤖 **Auto-Categorization** - Set up pattern-matching rules to automatically categorize transactions based on merchant names
+- 📸 **Receipt OCR Scanner** - Upload receipt photos to automatically extract transaction details (merchant, amount, date, items)
 
 ## Tech Stack
 
