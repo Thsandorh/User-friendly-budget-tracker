@@ -2,7 +2,46 @@
 
 Ez az útmutató segít a Budget Tracker alkalmazás Android APK buildjének létrehozásában.
 
-## Előfeltételek
+---
+
+## 🚀 AJÁNLOTT: Automatikus Build GitHub Actions-zel (LEGEGYSZERŰBB!)
+
+**Nincs szükség Android Studio-ra vagy semmilyen telepítésre!**
+
+### Hogyan működik:
+
+1. **Push-old a kódot GitHub-ra** (vagy várj a következő push-ra)
+2. **GitHub Actions automatikusan buildeli az APK-t** (~5-10 perc)
+3. **Töltsd le az APK-t** a GitHub-ról
+
+### APK Letöltése:
+
+1. Menj a GitHub repository-dba
+2. Kattints a **"Actions"** fülre felül
+3. Kattints a legutóbbi **"Build Android APK"** workflow-ra
+4. Görgess le az **"Artifacts"** szekcióhoz
+5. Töltsd le: **`budget-tracker-debug-apk`**
+6. Csomagold ki a ZIP fájlt
+7. Telepítsd az **`app-debug.apk`** fájlt a telefonodra
+
+### Manuális Build Triggerelése:
+
+1. GitHub repository → **"Actions"** fül
+2. Bal oldalt: **"Build Android APK"**
+3. Jobb oldalt: **"Run workflow"** gomb
+4. Válaszd ki a branch-et és kattints **"Run workflow"**
+5. Várj ~5-10 percet
+6. Töltsd le az APK-t az Artifacts-ból
+
+**Ez minden! Nem kell Android Studio, Java, vagy semmi más!** ✨
+
+---
+
+## 💻 OPCIONÁLIS: Lokális Build Android Studio-val
+
+Ha szeretnél lokálisan buildelni (fejlesztéshez vagy teszteléshez):
+
+### Előfeltételek
 
 1. **Android Studio** telepítése
    - Töltsd le: https://developer.android.com/studio
@@ -12,21 +51,21 @@ Ez az útmutató segít a Budget Tracker alkalmazás Android APK buildjének lé
    - JDK 17 vagy újabb szükséges
    - Ellenőrizd: `java -version`
 
-## Build Folyamat
+### Lokális Build Folyamat
 
-### 1. Függőségek telepítése
+#### 1. Függőségek telepítése
 
 ```bash
 npm install
 ```
 
-### 2. Capacitor szinkronizálás
+#### 2. Capacitor szinkronizálás
 
 ```bash
 npx cap sync android
 ```
 
-### 3. Android Studio megnyitása
+#### 3. Android Studio megnyitása
 
 ```bash
 npm run cap:open:android
