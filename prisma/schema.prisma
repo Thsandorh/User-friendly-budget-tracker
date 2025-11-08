@@ -26,6 +26,8 @@ model User {
   recurringTransactions RecurringTransaction[]
   savingsGoals  SavingsGoal[]
   billReminders BillReminder[]
+  assets        Asset[]
+  liabilities   Liability[]
 }
 
 // Budget model - users can have multiple budgets
@@ -161,4 +163,37 @@ model BillReminder {
 
   categoryId  String?
   category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+// Asset model - track assets (bank accounts, property, investments, etc.)
+model Asset {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // "cash", "bank", "investment", "property", "vehicle", "other"
+  value       Float
+  currency    String   @default("HUF")
+  icon        String   @default("💰")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Liability model - track liabilities (loans, credit cards, mortgages, etc.)
+model Liability {
+  id          String   @id @default(cuid())
+  name        String
+  type        String   // "loan", "mortgage", "credit_card", "other"
+  balance     Float
+  currency    String   @default("HUF")
+  interestRate Float?
+  icon        String   @default("💳")
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
