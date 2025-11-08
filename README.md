@@ -10,8 +10,11 @@ A full-featured budget tracking web application built with Next.js 14, TypeScrip
 - 💸 Transaction tracking (income and expenses)
 - 🏷️ Category management with custom icons and colors
 - 📊 Dashboard with financial overview and analytics
-- 🔄 Recurring transactions support (planned)
-- 📈 Reports and data export (planned)
+- 🔄 Recurring transactions (daily, weekly, monthly, yearly)
+- 📈 Advanced reports with interactive charts
+- 📥 Data export (CSV and PDF)
+- 🌙 Dark mode with theme switching
+- 📱 Progressive Web App (PWA) with offline support
 - 🌍 Multi-language support (Hungarian and English)
 - 📱 Fully responsive design
 - 🎨 Professional UI with Tailwind CSS and shadcn/ui
@@ -26,6 +29,10 @@ A full-featured budget tracking web application built with Next.js 14, TypeScrip
 - **ORM:** Prisma
 - **Authentication:** NextAuth.js
 - **Internationalization:** next-intl
+- **Charts:** Recharts
+- **Theme:** next-themes (dark mode)
+- **PDF Export:** jsPDF + jspdf-autotable
+- **PWA:** Service Worker + Web App Manifest
 - **Deployment:** Vercel
 
 ## Prerequisites
@@ -51,27 +58,25 @@ npm install
 
 ### 3. Set up environment variables
 
-Create a `.env` file in the root directory:
+Create a `.env` file in the root directory (minimal configuration):
 
 ```env
 # Database (for local development use SQLite)
 DATABASE_URL="file:./dev.db"
 
-# For production with PostgreSQL:
+# For production with PostgreSQL (Vercel auto-provides this):
 # DATABASE_URL="postgresql://user:password@localhost:5432/budget_tracker"
 
-# NextAuth
+# NextAuth (only required variable)
 NEXTAUTH_SECRET="your-secret-key-here"
-NEXTAUTH_URL="http://localhost:3000"
-
-# App Settings
-NEXT_PUBLIC_APP_URL="http://localhost:3000"
 ```
 
 Generate a secure secret for NEXTAUTH_SECRET:
 ```bash
 openssl rand -base64 32
 ```
+
+**Note:** Vercel automatically provides `DATABASE_URL` when you add Vercel Postgres. `NEXTAUTH_URL` is auto-detected in production.
 
 ### 4. Set up the database
 
@@ -128,13 +133,13 @@ git push origin main
 
 4. **Add environment variables**
 
-   In your Vercel project settings, add these environment variables:
+   In your Vercel project settings, add only this environment variable:
 
    ```
    NEXTAUTH_SECRET=<generate-a-secure-random-string>
-   NEXTAUTH_URL=https://your-app-name.vercel.app
-   NEXT_PUBLIC_APP_URL=https://your-app-name.vercel.app
    ```
+
+   **Note:** Vercel automatically provides `DATABASE_URL` from Postgres and `NEXTAUTH_URL` is auto-detected.
 
 5. **Deploy**
    - Vercel will automatically deploy your app
@@ -166,17 +171,72 @@ See `prisma/schema.prisma` for the complete schema.
 ├── app/                      # Next.js app directory
 │   ├── [locale]/            # Internationalized routes
 │   │   ├── (dashboard)/     # Dashboard pages
+│   │   │   ├── budgets/     # Budget management
+│   │   │   ├── categories/  # Category management
+│   │   │   ├── dashboard/   # Overview dashboard
+│   │   │   ├── recurring/   # Recurring transactions
+│   │   │   ├── reports/     # Reports & charts
+│   │   │   ├── settings/    # User settings
+│   │   │   └── transactions/ # Transaction management
 │   │   └── auth/            # Authentication pages
 │   └── api/                 # API routes
+│       ├── auth/            # NextAuth endpoints
+│       ├── budgets/         # Budget CRUD
+│       ├── categories/      # Category CRUD
+│       ├── recurring/       # Recurring transaction CRUD
+│       └── transactions/    # Transaction CRUD
 ├── components/              # React components
-│   └── ui/                  # UI components (shadcn/ui)
+│   ├── ui/                  # UI components (shadcn/ui)
+│   ├── theme-provider.tsx   # Dark mode provider
+│   ├── theme-toggle.tsx     # Theme switch component
+│   └── recurring-dialog.tsx # Recurring transaction form
 ├── lib/                     # Utility functions
+│   └── export.ts            # CSV/PDF export utilities
 ├── messages/                # i18n translations
 │   ├── en.json             # English translations
 │   └── hu.json             # Hungarian translations
 ├── prisma/                  # Prisma schema and migrations
 └── public/                  # Static assets
+    ├── manifest.json        # PWA manifest
+    └── sw.js                # Service Worker
 ```
+
+## Detailed Features
+
+### 🔄 Recurring Transactions
+- Create transactions that automatically repeat
+- Frequency options: Daily, Weekly, Monthly, Yearly
+- Customizable start date and next occurrence
+- Active/inactive status management
+- Automatic calculation of next occurrence date
+
+### 📈 Advanced Reports & Charts
+- **Category Breakdown**: Pie chart showing expense distribution by category
+- **Income vs Expense**: Bar chart comparing income and expenses
+- **Monthly Trends**: Line chart showing financial trends over the last 6 months
+- Interactive charts built with Recharts
+- Date range filtering
+- Real-time data updates
+
+### 📥 Data Export
+- **CSV Export**: Download all transactions in spreadsheet format
+- **PDF Export**: Professional formatted PDF reports with:
+  - Transaction list with all details
+  - Summary section (total income, expenses, balance)
+  - Automatic table formatting with jsPDF-autotable
+
+### 🌙 Dark Mode
+- Toggle between Light, Dark, and System theme
+- Persistent theme preference
+- Smooth transitions between themes
+- System preference detection
+
+### 📱 Progressive Web App (PWA)
+- Install on mobile devices like a native app
+- Offline support with Service Worker
+- Cache-first strategy for optimal performance
+- App icons and splash screens
+- Standalone display mode
 
 ## Scripts
 
@@ -230,12 +290,14 @@ npx prisma migrate dev
 - [x] Dashboard with overview
 - [x] Multi-language support (HU/EN)
 - [x] Responsive design
-- [ ] Recurring transactions
-- [ ] Advanced reports and analytics
-- [ ] Data export (CSV, PDF)
+- [x] Recurring transactions
+- [x] Advanced reports and analytics
+- [x] Data export (CSV, PDF)
+- [x] Dark mode
+- [x] Progressive Web App (PWA)
 - [ ] Budget alerts and notifications
-- [ ] Dark mode
-- [ ] Mobile app (React Native)
+- [ ] Email notifications
+- [ ] Mobile app companion
 
 ## Contributing
 
