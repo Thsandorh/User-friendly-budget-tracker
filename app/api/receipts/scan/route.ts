@@ -129,9 +129,11 @@ function extractAmount(text: string): number | null {
 
   // Fallback: try to find any large number that could be a total
   const amounts: number[] = []
+  const numberPattern = /(\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d{2})?)/g
+
   for (const line of lines) {
-    const matches = line.matchAll(/(\d{1,3}(?:[.,\s]\d{3})*(?:[.,]\d{2})?)/g)
-    for (const match of matches) {
+    let match
+    while ((match = numberPattern.exec(line)) !== null) {
       const cleanNumber = match[1]
         .replace(/\s/g, '')
         .replace(/,/g, '.')
@@ -142,6 +144,8 @@ function extractAmount(text: string): number | null {
         amounts.push(amount)
       }
     }
+    // Reset lastIndex for next line
+    numberPattern.lastIndex = 0
   }
 
   // Return the largest amount found (likely the total)
