@@ -33,6 +33,7 @@ model User {
   dailyLimits           DailyLimit[]
   weeklyLimits          WeeklyLimit[]
   monthlyLimits         MonthlyLimit[]
+  transactionTemplates  TransactionTemplate[]
 }
 
 // Budget model - users can have multiple budgets
@@ -77,6 +78,7 @@ model Category {
   transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
   billReminders         BillReminder[]
+  transactionTemplates  TransactionTemplate[]
 }
 
 // Transaction model - income and expenses
@@ -286,4 +288,25 @@ model MonthlyLimit {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, monthStart]) // One limit per user per month
+}
+
+// Transaction Template - save favorite/frequent transactions as templates
+model TransactionTemplate {
+  id          String   @id @default(cuid())
+  name        String // Template name (e.g., "Morning Coffee", "Weekly Groceries")
+  amount      Float // Default amount
+  description String // Transaction description
+  type        String // "income" or "expense"
+  icon        String   @default("⭐") // Emoji icon for the template
+  color       String   @default("#3b82f6") // Color for visual identification
+  isActive    Boolean  @default(true)
+  useCount    Int      @default(0) // Track how many times this template was used
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 }

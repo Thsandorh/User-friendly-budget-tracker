@@ -12,6 +12,8 @@ import { BudgetAlerts } from "@/components/budget-alerts"
 import { DailyLimitCard } from "@/components/daily-limit-card"
 import { WeeklyLimitCard } from "@/components/weekly-limit-card"
 import { MonthlyLimitCard } from "@/components/monthly-limit-card"
+import { QuickEntryButtons } from "@/components/quick-entry-buttons"
+import { FavoriteTransactions } from "@/components/favorite-transactions"
 
 export default async function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
   const session = await getServerSession(authOptions)
@@ -126,6 +128,12 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
 
       {/* Budget Alerts */}
       <BudgetAlerts alerts={budgetAlerts} locale={locale} />
+
+      {/* Quick Entry Buttons */}
+      <QuickEntryButtons locale={locale} />
+
+      {/* Favorite Transactions */}
+      <FavoriteTransactions locale={locale} />
 
       {/* Spending Limit Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">

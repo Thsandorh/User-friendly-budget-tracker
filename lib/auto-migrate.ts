@@ -260,6 +260,25 @@ export async function ensureDatabaseSchema() {
         ON "MonthlyLimit"("userId", "monthStart")
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "TransactionTemplate" (
+          "id" TEXT NOT NULL,
+          "name" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "description" TEXT NOT NULL,
+          "type" TEXT NOT NULL,
+          "icon" TEXT NOT NULL DEFAULT '⭐',
+          "color" TEXT NOT NULL DEFAULT '#3b82f6',
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "useCount" INTEGER NOT NULL DEFAULT 0,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          "categoryId" TEXT,
+          CONSTRAINT "TransactionTemplate_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
     // STEP 1: Add new columns FIRST (before foreign keys that reference them)
     await db.$executeRawUnsafe(`
       DO $$
@@ -482,6 +501,26 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MonthlyLimit_userId_fkey') THEN
             ALTER TABLE "MonthlyLimit" ADD CONSTRAINT "MonthlyLimit_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TransactionTemplate_userId_fkey') THEN
+            ALTER TABLE "TransactionTemplate" ADD CONSTRAINT "TransactionTemplate_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TransactionTemplate_categoryId_fkey') THEN
+            ALTER TABLE "TransactionTemplate" ADD CONSTRAINT "TransactionTemplate_categoryId_fkey"
+            FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
           END IF;
         END $$
       `)
