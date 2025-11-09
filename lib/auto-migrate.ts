@@ -200,6 +200,26 @@ export async function ensureDatabaseSchema() {
         )
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "DailyLimit" (
+          "id" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'HUF',
+          "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "notes" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "DailyLimit_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS "DailyLimit_userId_date_key"
+        ON "DailyLimit"("userId", "date")
+      `)
+
     // STEP 1: Add new columns FIRST (before foreign keys that reference them)
     await db.$executeRawUnsafe(`
       DO $$
@@ -391,6 +411,16 @@ export async function ensureDatabaseSchema() {
         BEGIN
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'CategorizationRule_userId_fkey') THEN
             ALTER TABLE "CategorizationRule" ADD CONSTRAINT "CategorizationRule_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DailyLimit_userId_fkey') THEN
+            ALTER TABLE "DailyLimit" ADD CONSTRAINT "DailyLimit_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
