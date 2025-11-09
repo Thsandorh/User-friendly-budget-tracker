@@ -11,7 +11,7 @@ const getBudgetWidgetPlugin = (): BudgetWidgetPlugin | null => {
   if (Capacitor.isNativePlatform() && Capacitor.getPlatform() === 'android') {
     try {
       const { registerPlugin } = require('@capacitor/core')
-      return registerPlugin<BudgetWidgetPlugin>('BudgetWidget')
+      return registerPlugin('BudgetWidget') as BudgetWidgetPlugin
     } catch (e) {
       console.warn('BudgetWidget plugin not available:', e)
       return null
