@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getServerSession } from 'next-auth';
-import { prisma } from '@/lib/prisma';
+import { db } from '@/lib/db';
 import { startOfDay, endOfDay } from 'date-fns';
 
 // GET /api/daily-limits - Get daily limits
@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: session.user.email },
     });
 
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
       const dayStart = startOfDay(date);
       const dayEnd = endOfDay(date);
 
-      const dailyLimit = await prisma.dailyLimit.findFirst({
+      const dailyLimit = await db.dailyLimit.findFirst({
         where: {
           userId: user.id,
           date: {
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
       });
 
       // Calculate today's spending
-      const todaySpending = await prisma.transaction.aggregate({
+      const todaySpending = await db.transaction.aggregate({
         where: {
           userId: user.id,
           type: 'expense',
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Otherwise get all active limits
-    const dailyLimits = await prisma.dailyLimit.findMany({
+    const dailyLimits = await db.dailyLimit.findMany({
       where: {
         userId: user.id,
         isActive: true,
@@ -92,7 +92,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: session.user.email },
     });
 
@@ -114,7 +114,7 @@ export async function POST(request: NextRequest) {
     const dayStart = startOfDay(limitDate);
 
     // Upsert - update if exists, create if not
-    const dailyLimit = await prisma.dailyLimit.upsert({
+    const dailyLimit = await db.dailyLimit.upsert({
       where: {
         userId_date: {
           userId: user.id,
@@ -156,7 +156,7 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = await prisma.user.findUnique({
+    const user = await db.user.findUnique({
       where: { email: session.user.email },
     });
 
@@ -174,7 +174,7 @@ export async function DELETE(request: NextRequest) {
       );
     }
 
-    await prisma.dailyLimit.delete({
+    await db.dailyLimit.delete({
       where: {
         id,
         userId: user.id, // Ensure user owns this limit
