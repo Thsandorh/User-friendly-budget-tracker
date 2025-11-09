@@ -200,26 +200,26 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
           ) : (
             <div className="space-y-3">
               {filteredTransactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-3 h-3 rounded-full ${
+                <div key={transaction.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border rounded-lg hover:bg-accent transition-colors">
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
                       transaction.type === 'income' ? 'bg-green-600' : 'bg-red-600'
                     }`} />
-                    <div>
-                      <p className="font-medium">{transaction.description}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{transaction.description}</p>
+                      <p className="text-sm text-muted-foreground truncate">
                         {transaction.category?.icon} {transaction.category?.name || t("categories.uncategorized")} • {formatDateShort(transaction.date, locale)}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <p className={`font-bold ${
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                    <p className={`font-bold whitespace-nowrap ${
                       transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}
                       {formatCurrency(transaction.amount, "HUF", locale)}
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0">
                       <Button variant="outline" size="sm" onClick={() => handleEdit(transaction)}>
                         {t("common.edit")}
                       </Button>

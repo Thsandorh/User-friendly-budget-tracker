@@ -9,6 +9,9 @@ import { Plus } from "lucide-react"
 import { formatCurrency, formatDateShort } from "@/lib/utils"
 import { BudgetDialog } from "@/components/budget-dialog"
 import { useToast } from "@/components/ui/use-toast"
+import { DailyLimitCard } from "@/components/daily-limit-card"
+import { WeeklyLimitCard } from "@/components/weekly-limit-card"
+import { MonthlyLimitCard } from "@/components/monthly-limit-card"
 
 export default function BudgetsPage({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations()
@@ -78,6 +81,19 @@ export default function BudgetsPage({ params: { locale } }: { params: { locale: 
         </Button>
       </div>
 
+      {/* Spending Limit Cards */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">{locale === 'hu' ? 'Költési Limitek' : 'Spending Limits'}</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <DailyLimitCard />
+          <WeeklyLimitCard />
+          <MonthlyLimitCard />
+        </div>
+      </div>
+
+      {/* Budget List */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">{locale === 'hu' ? 'Költségvetések' : 'Budgets'}</h2>
       {budgets.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -125,6 +141,7 @@ export default function BudgetsPage({ params: { locale } }: { params: { locale: 
           ))}
         </div>
       )}
+      </div>
 
       <BudgetDialog
         open={isDialogOpen}
