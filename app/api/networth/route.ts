@@ -5,6 +5,8 @@ import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { ensureDatabaseSchema } from "@/lib/auto-migrate"
 
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   await ensureDatabaseSchema()
 

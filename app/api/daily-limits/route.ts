@@ -3,6 +3,8 @@ import { getServerSession } from 'next-auth';
 import { db } from '@/lib/db';
 import { startOfDay, endOfDay } from 'date-fns';
 
+export const dynamic = 'force-dynamic'
+
 // GET /api/daily-limits - Get daily limits
 export async function GET(request: NextRequest) {
   try {
