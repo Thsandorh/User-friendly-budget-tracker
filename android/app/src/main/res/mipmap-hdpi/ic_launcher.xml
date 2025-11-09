@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="72dp"
+    android:height="72dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+
+    <!-- Background circle with gradient -->
+    <path
+        android:pathData="M100,10a90,90 0 1,0 0,180a90,90 0 1,0 0,-180"
+        android:fillColor="#6366f1"/>
+
+    <!-- Flow waves -->
+    <path
+        android:pathData="M 40 80 Q 60 70, 80 80 T 120 80 T 160 80"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:strokeAlpha="0.4"/>
+
+    <path
+        android:pathData="M 40 100 Q 60 90, 80 100 T 120 100 T 160 100"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:strokeAlpha="0.6"/>
+
+    <path
+        android:pathData="M 40 120 Q 60 110, 80 120 T 120 120 T 160 120"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="6"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"
+        android:strokeAlpha="0.8"/>
+
+    <!-- Trending up arrow -->
+    <path
+        android:pathData="M 130 90 L 160 60 L 160 75 M 160 60 L 145 60"
+        android:strokeColor="#ffffff"
+        android:strokeWidth="8"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:fillColor="#00000000"/>
+</vector>

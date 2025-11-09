@@ -12,6 +12,7 @@ import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { useToast } from "@/components/ui/use-toast"
+import { FinFlowIcon } from "@/components/finflow-icon"
 import {
   Wallet,
   TrendingUp,
@@ -180,14 +181,18 @@ export default function SignInPage({ params: { locale } }: { params: { locale: s
           <div className="space-y-8">
             {/* Hero */}
             <div className="space-y-4">
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium">
-                <Zap className="h-4 w-4" />
-                {locale === 'hu' ? 'Professzionális pénzügyi menedzsment' : 'Professional Financial Management'}
+              <div className="flex items-center gap-4">
+                <FinFlowIcon className="w-20 h-20 md:w-24 md:h-24" />
+                <div>
+                  <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full text-primary text-sm font-medium mb-2">
+                    <Zap className="h-4 w-4" />
+                    {locale === 'hu' ? 'Professzionális pénzügyi menedzsment' : 'Professional Financial Management'}
+                  </div>
+                  <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    FinFlow
+                  </h1>
+                </div>
               </div>
-
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                FinFlow
-              </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground">
                 {locale === 'hu'
