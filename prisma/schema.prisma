@@ -35,6 +35,8 @@ model User {
   monthlyLimits         MonthlyLimit[]
   transactionTemplates  TransactionTemplate[]
   notificationSettings  NotificationSettings?
+  savingsChallenges     SavingsChallenge[]
+  quickEntryPresets     QuickEntryPreset[]
 }
 
 // Budget model - users can have multiple budgets
@@ -363,4 +365,22 @@ model SavingsChallenge {
 
   userId String
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Quick Entry Preset - customizable quick entry buttons
+model QuickEntryPreset {
+  id          String   @id @default(cuid())
+  name        String // Display name
+  nameHu      String // Hungarian name
+  amount      Float // Default amount
+  icon        String   @default("⚡") // Emoji icon
+  sortOrder   Int      @default(0) // Display order
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sortOrder])
 }

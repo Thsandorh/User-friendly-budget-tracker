@@ -334,6 +334,27 @@ export async function ensureDatabaseSchema() {
         )
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "QuickEntryPreset" (
+          "id" TEXT NOT NULL,
+          "name" TEXT NOT NULL,
+          "nameHu" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "icon" TEXT NOT NULL DEFAULT '⚡',
+          "sortOrder" INTEGER NOT NULL DEFAULT 0,
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "QuickEntryPreset_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE INDEX IF NOT EXISTS "QuickEntryPreset_userId_sortOrder_idx"
+        ON "QuickEntryPreset"("userId", "sortOrder")
+      `)
+
     // STEP 1: Add new columns FIRST (before foreign keys that reference them)
     await db.$executeRawUnsafe(`
       DO $$
@@ -605,6 +626,16 @@ export async function ensureDatabaseSchema() {
         BEGIN
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SavingsChallenge_userId_fkey') THEN
             ALTER TABLE "SavingsChallenge" ADD CONSTRAINT "SavingsChallenge_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'QuickEntryPreset_userId_fkey') THEN
+            ALTER TABLE "QuickEntryPreset" ADD CONSTRAINT "QuickEntryPreset_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
