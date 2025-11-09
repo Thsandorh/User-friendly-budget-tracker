@@ -333,3 +333,4 @@ For issues and questions, please open an issue on GitHub.
 - UI components from [shadcn/ui](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
+- 
