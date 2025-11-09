@@ -14,6 +14,8 @@ import { WeeklyLimitCard } from "@/components/weekly-limit-card"
 import { MonthlyLimitCard } from "@/components/monthly-limit-card"
 import { QuickEntryButtons } from "@/components/quick-entry-buttons"
 import { FavoriteTransactions } from "@/components/favorite-transactions"
+import { SpendingInsights } from "@/components/spending-insights"
+import { startOfWeek, endOfWeek, getDay, format } from "date-fns"
 
 export default async function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
   const session = await getServerSession(authOptions)
@@ -117,6 +119,69 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
     }
   }).filter(alert => alert.percentage >= 80) // Only show alerts at 80% or more
 
+  // Calculate spending insights
+  const thisWeekStart = startOfWeek(now, { weekStartsOn: 1 })
+  const thisWeekEnd = endOfWeek(now, { weekStartsOn: 1 })
+  const lastWeekStart = startOfWeek(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), { weekStartsOn: 1 })
+  const lastWeekEnd = endOfWeek(new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000), { weekStartsOn: 1 })
+
+  const thisWeekTransactions = await db.transaction.findMany({
+    where: {
+      userId: session.user.id,
+      type: 'expense',
+      date: { gte: thisWeekStart, lte: thisWeekEnd },
+    },
+    include: { category: true },
+  })
+
+  const lastWeekTransactions = await db.transaction.findMany({
+    where: {
+      userId: session.user.id,
+      type: 'expense',
+      date: { gte: lastWeekStart, lte: lastWeekEnd },
+    },
+  })
+
+  const thisWeekSpending = thisWeekTransactions.reduce((sum, t) => sum + t.amount, 0)
+  const lastWeekSpending = lastWeekTransactions.reduce((sum, t) => sum + t.amount, 0)
+  const weeklyChange = thisWeekSpending - lastWeekSpending
+
+  // Calculate top spending day
+  const daySpending: Record<number, number> = {}
+  thisWeekTransactions.forEach(t => {
+    const day = getDay(new Date(t.date))
+    daySpending[day] = (daySpending[day] || 0) + t.amount
+  })
+  const topDay = Object.entries(daySpending).sort(([,a], [,b]) => b - a)[0]
+  const dayNames = locale === 'hu'
+    ? ['vasárnap', 'hétfőn', 'kedden', 'szerdán', 'csütörtökön', 'pénteken', 'szombaton']
+    : ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+  const topSpendingDay = topDay ? dayNames[parseInt(topDay[0])] : ''
+
+  // Calculate top category
+  const categorySpending: Record<string, number> = {}
+  thisWeekTransactions.forEach(t => {
+    if (t.category) {
+      categorySpending[t.category.name] = (categorySpending[t.category.name] || 0) + t.amount
+    }
+  })
+  const topCat = Object.entries(categorySpending).sort(([,a], [,b]) => b - a)[0]
+  const topCategory = topCat ? topCat[0] : ''
+  const topCategoryAmount = topCat ? Math.round(topCat[1]) : 0
+
+  // Calculate average daily spending
+  const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate()
+  const avgDailySpending = Math.round(totalExpense / daysInMonth)
+
+  const insightsData = {
+    weeklyChange,
+    monthlyChange: 0,
+    topSpendingDay,
+    topCategory,
+    topCategoryAmount,
+    avgDailySpending,
+  }
+
   return (
     <div className="space-y-8">
       <div>
@@ -134,6 +199,9 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
 
       {/* Favorite Transactions */}
       <FavoriteTransactions locale={locale} />
+
+      {/* Spending Insights */}
+      <SpendingInsights data={insightsData} locale={locale} />
 
       {/* Spending Limit Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
