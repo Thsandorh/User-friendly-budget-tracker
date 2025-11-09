@@ -292,6 +292,48 @@ export async function ensureDatabaseSchema() {
         )
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "NotificationSettings" (
+          "id" TEXT NOT NULL,
+          "dailySummary" BOOLEAN NOT NULL DEFAULT true,
+          "dailySummaryTime" TEXT NOT NULL DEFAULT '20:00',
+          "weeklySummary" BOOLEAN NOT NULL DEFAULT true,
+          "limitWarning" BOOLEAN NOT NULL DEFAULT true,
+          "budgetExceeded" BOOLEAN NOT NULL DEFAULT true,
+          "emailNotifications" BOOLEAN NOT NULL DEFAULT false,
+          "pushNotifications" BOOLEAN NOT NULL DEFAULT true,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "NotificationSettings_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS "NotificationSettings_userId_key"
+        ON "NotificationSettings"("userId")
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "SavingsChallenge" (
+          "id" TEXT NOT NULL,
+          "name" TEXT NOT NULL,
+          "description" TEXT NOT NULL,
+          "targetAmount" DOUBLE PRECISION NOT NULL,
+          "currentAmount" DOUBLE PRECISION NOT NULL DEFAULT 0,
+          "startDate" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "endDate" TIMESTAMP(3) NOT NULL,
+          "isCompleted" BOOLEAN NOT NULL DEFAULT false,
+          "reward" TEXT,
+          "icon" TEXT NOT NULL DEFAULT '🏆',
+          "color" TEXT NOT NULL DEFAULT '#10b981',
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "SavingsChallenge_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
     // STEP 1: Add new columns FIRST (before foreign keys that reference them)
     await db.$executeRawUnsafe(`
       DO $$
@@ -544,6 +586,26 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ReceiptPhoto_transactionId_fkey') THEN
             ALTER TABLE "ReceiptPhoto" ADD CONSTRAINT "ReceiptPhoto_transactionId_fkey"
             FOREIGN KEY ("transactionId") REFERENCES "Transaction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'NotificationSettings_userId_fkey') THEN
+            ALTER TABLE "NotificationSettings" ADD CONSTRAINT "NotificationSettings_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SavingsChallenge_userId_fkey') THEN
+            ALTER TABLE "SavingsChallenge" ADD CONSTRAINT "SavingsChallenge_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
       `)

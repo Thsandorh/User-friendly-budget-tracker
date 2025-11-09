@@ -16,6 +16,7 @@ import { QuickEntryButtons } from "@/components/quick-entry-buttons"
 import { FavoriteTransactions } from "@/components/favorite-transactions"
 import { SpendingInsights } from "@/components/spending-insights"
 import { SpendingCalendar } from "@/components/spending-calendar"
+import { SavingsChallenges } from "@/components/savings-challenges"
 import { startOfWeek, endOfWeek, getDay, format, startOfMonth as startOfMonthFn, endOfMonth as endOfMonthFn } from "date-fns"
 
 export default async function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
@@ -228,6 +229,9 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
 
       {/* Spending Calendar */}
       <SpendingCalendar data={calendarData} dailyLimit={5000} locale={locale} />
+
+      {/* Savings Challenges */}
+      <SavingsChallenges locale={locale} />
 
       {/* Spending Limit Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
