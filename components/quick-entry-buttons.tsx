@@ -122,7 +122,12 @@ export function QuickEntryButtons({ locale }: { locale: string }) {
 
   const handleUpdatePreset = (index: number, field: keyof QuickEntryPreset, value: any) => {
     const updated = [...editingPresets]
-    updated[index] = { ...updated[index], [field]: value }
+    // When updating name, update both name and nameHu to keep them in sync
+    if (field === 'name' || field === 'nameHu') {
+      updated[index] = { ...updated[index], name: value, nameHu: value }
+    } else {
+      updated[index] = { ...updated[index], [field]: value }
+    }
     setEditingPresets(updated)
   }
 
@@ -320,28 +325,15 @@ export function QuickEntryButtons({ locale }: { locale: string }) {
                   <X className="h-4 w-4" />
                 </Button>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="space-y-2">
-                    <Label>
-                      {locale === 'hu' ? 'Név (Magyar)' : 'Name (Hungarian)'}
-                    </Label>
-                    <Input
-                      value={preset.nameHu}
-                      onChange={(e) => handleUpdatePreset(index, 'nameHu', e.target.value)}
-                      placeholder={locale === 'hu' ? 'pl. Kávé' : 'e.g. Kávé'}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>
-                      {locale === 'hu' ? 'Név (Angol)' : 'Name (English)'}
-                    </Label>
-                    <Input
-                      value={preset.name}
-                      onChange={(e) => handleUpdatePreset(index, 'name', e.target.value)}
-                      placeholder={locale === 'hu' ? 'pl. Coffee' : 'e.g. Coffee'}
-                    />
-                  </div>
+                <div className="space-y-2">
+                  <Label>
+                    {locale === 'hu' ? 'Név' : 'Name'}
+                  </Label>
+                  <Input
+                    value={locale === 'hu' ? preset.nameHu : preset.name}
+                    onChange={(e) => handleUpdatePreset(index, 'name', e.target.value)}
+                    placeholder={locale === 'hu' ? 'pl. Kávé' : 'e.g. Coffee'}
+                  />
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">
