@@ -17,7 +17,8 @@ import { FavoriteTransactions } from "@/components/favorite-transactions"
 import { SpendingInsights } from "@/components/spending-insights"
 import { SpendingCalendar } from "@/components/spending-calendar"
 import { SavingsChallenges } from "@/components/savings-challenges"
-import { startOfWeek, endOfWeek, getDay, format, startOfMonth as startOfMonthFn, endOfMonth as endOfMonthFn } from "date-fns"
+import { WidgetUpdater } from "@/components/widget-updater"
+import { startOfWeek, endOfWeek, getDay, format, startOfMonth as startOfMonthFn, endOfMonth as endOfMonthFn, startOfDay, endOfDay } from "date-fns"
 
 export default async function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
   const session = await getServerSession(authOptions)
@@ -206,8 +207,35 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
     amount,
   }))
 
+  // Calculate today's spending and daily limit for widget
+  const todayStart = startOfDay(now)
+  const todayEnd = endOfDay(now)
+  const todayTransactions = await db.transaction.findMany({
+    where: {
+      userId: session.user.id,
+      type: 'expense',
+      date: { gte: todayStart, lte: todayEnd },
+    },
+  })
+  const spentToday = todayTransactions.reduce((sum, t) => sum + t.amount, 0)
+
+  // Get today's daily limit
+  const todayDate = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+  const todayLimit = await db.dailyLimit.findUnique({
+    where: {
+      userId_date: {
+        userId: session.user.id,
+        date: todayDate,
+      },
+    },
+  })
+  const dailyLimitAmount = todayLimit?.amount || 5000
+
   return (
     <div className="space-y-8">
+      {/* Widget Updater - invisible component that updates Android widget */}
+      <WidgetUpdater dailyLimit={dailyLimitAmount} spentToday={spentToday} />
+
       <div>
         <h1 className="text-3xl font-bold tracking-tight">
           {t("dashboard.welcome", { name: session.user.name })}

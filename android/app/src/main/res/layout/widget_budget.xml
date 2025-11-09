@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="@drawable/widget_background">
+
+    <!-- Header -->
+    <TextView
+        android:id="@+id/widget_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="FinFlow"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#6366F1"
+        android:gravity="center"
+        android:paddingBottom="8dp" />
+
+    <!-- Daily Limit -->
+    <TextView
+        android:id="@+id/widget_daily_limit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Napi limit: 5,000 Ft"
+        android:textSize="12sp"
+        android:textColor="#6B7280"
+        android:paddingBottom="4dp" />
+
+    <!-- Spent Today -->
+    <TextView
+        android:id="@+id/widget_spent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Elköltve: 0 Ft"
+        android:textSize="12sp"
+        android:textColor="#EF4444"
+        android:paddingBottom="8dp" />
+
+    <!-- Progress Bar -->
+    <ProgressBar
+        android:id="@+id/widget_progress"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="8dp"
+        android:max="100"
+        android:progress="0"
+        android:progressTint="#6366F1"
+        android:progressBackgroundTint="#E5E7EB" />
+
+    <!-- Percentage and Remaining -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/widget_percentage"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="0%"
+            android:textSize="11sp"
+            android:textColor="#6B7280"
+            android:gravity="start" />
+
+        <TextView
+            android:id="@+id/widget_remaining"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="5,000 Ft"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:textColor="#10B981"
+            android:gravity="end" />
+    </LinearLayout>
+
+    <!-- Last Update -->
+    <TextView
+        android:id="@+id/widget_last_update"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:textSize="10sp"
+        android:textColor="#9CA3AF"
+        android:gravity="center"
+        android:paddingTop="4dp" />
+
+</LinearLayout>
