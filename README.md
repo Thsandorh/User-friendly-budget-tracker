@@ -1,6 +1,6 @@
-# Budget Tracker - Professional Budget Management Application
+# FinFlow - Professional Finance Management Application
 
-A full-featured budget tracking web application built with Next.js 14, TypeScript, and Prisma. Track your income, expenses, budgets, and financial goals with ease. Available in both Hungarian and English.
+A full-featured finance management web application built with Next.js 14, TypeScript, and Prisma. Track your income, expenses, budgets, and financial goals with ease. Available in both Hungarian and English.
 
 ## Features
 

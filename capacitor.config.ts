@@ -1,8 +1,8 @@
 import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
-  appId: 'com.budgettracker.app',
-  appName: 'Budget Tracker',
+  appId: 'com.finflow.app',
+  appName: 'FinFlow',
   webDir: 'out',
   server: {
     androidScheme: 'https',

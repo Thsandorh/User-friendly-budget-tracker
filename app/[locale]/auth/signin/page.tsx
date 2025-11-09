@@ -186,7 +186,7 @@ export default function SignInPage({ params: { locale } }: { params: { locale: s
               </div>
 
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                Budget Tracker
+                FinFlow
               </h1>
 
               <p className="text-xl md:text-2xl text-muted-foreground">

@@ -1,8 +1,8 @@
 {
   "id": "/",
-  "name": "Budget Tracker - Költségvetés Követő",
-  "short_name": "Budget Tracker",
-  "description": "Professional budget tracking application with Hungarian and English language support. Track expenses, scan receipts with OCR, and manage your budget offline.",
+  "name": "FinFlow - Smart Finance Management",
+  "short_name": "FinFlow",
+  "description": "Professional finance management application with Hungarian and English language support. Track expenses, scan receipts with OCR, and manage your budget offline.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
@@ -48,14 +48,14 @@
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "narrow",
-      "label": "Budget Tracker Main View"
+      "label": "FinFlow Main View"
     },
     {
       "src": "/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "form_factor": "wide",
-      "label": "Budget Tracker Dashboard"
+      "label": "FinFlow Dashboard"
     }
   ],
   "categories": ["finance", "productivity"],

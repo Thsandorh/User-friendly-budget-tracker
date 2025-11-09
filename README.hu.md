@@ -1,6 +1,6 @@
-# 💰 Budget Tracker - Költségvetés Követő Alkalmazás
+# 💰 FinFlow - Pénzügyi Menedzsment Alkalmazás
 
-Professzionális, felhasználóbarát költségvetés követő alkalmazás magyar és angol nyelven, nyugta szkenneléssel, OCR technológiával és offline támogatással.
+Professzionális, felhasználóbarát pénzügyi menedzsment alkalmazás magyar és angol nyelven, nyugta szkenneléssel, OCR technológiával és offline támogatással.
 
 ---
 
