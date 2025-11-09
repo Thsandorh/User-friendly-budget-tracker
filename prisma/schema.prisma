@@ -34,6 +34,7 @@ model User {
   weeklyLimits          WeeklyLimit[]
   monthlyLimits         MonthlyLimit[]
   transactionTemplates  TransactionTemplate[]
+  notificationSettings  NotificationSettings?
 }
 
 // Budget model - users can have multiple budgets
@@ -109,6 +110,22 @@ model Transaction {
   parentTransaction   Transaction?  @relation("SplitTransactions", fields: [parentTransactionId], references: [id], onDelete: Cascade)
   splitTransactions   Transaction[] @relation("SplitTransactions")
   splitPercentage     Float?
+
+  // Receipt photos
+  receiptPhotos ReceiptPhoto[]
+}
+
+// Receipt Photo - store photo attachments for transactions
+model ReceiptPhoto {
+  id            String   @id @default(cuid())
+  url           String // Photo URL (stored in public folder or cloud storage)
+  fileName      String
+  fileSize      Int? // File size in bytes
+  mimeType      String   @default("image/jpeg")
+  uploadedAt    DateTime @default(now())
+
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 }
 
 // Recurring transaction model for automatic transactions
@@ -309,4 +326,21 @@ model TransactionTemplate {
 
   categoryId String?
   category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+// Notification Settings - user preferences for notifications
+model NotificationSettings {
+  id                    String   @id @default(cuid())
+  dailySummary          Boolean  @default(true)
+  dailySummaryTime      String   @default("20:00")
+  weeklySummary         Boolean  @default(true)
+  limitWarning          Boolean  @default(true)
+  budgetExceeded        Boolean  @default(true)
+  emailNotifications    Boolean  @default(false)
+  pushNotifications     Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

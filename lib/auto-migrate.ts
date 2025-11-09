@@ -279,6 +279,19 @@ export async function ensureDatabaseSchema() {
         )
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "ReceiptPhoto" (
+          "id" TEXT NOT NULL,
+          "url" TEXT NOT NULL,
+          "fileName" TEXT NOT NULL,
+          "fileSize" INTEGER,
+          "mimeType" TEXT NOT NULL DEFAULT 'image/jpeg',
+          "uploadedAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "transactionId" TEXT NOT NULL,
+          CONSTRAINT "ReceiptPhoto_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
     // STEP 1: Add new columns FIRST (before foreign keys that reference them)
     await db.$executeRawUnsafe(`
       DO $$
@@ -521,6 +534,16 @@ export async function ensureDatabaseSchema() {
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'TransactionTemplate_categoryId_fkey') THEN
             ALTER TABLE "TransactionTemplate" ADD CONSTRAINT "TransactionTemplate_categoryId_fkey"
             FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE SET NULL ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'ReceiptPhoto_transactionId_fkey') THEN
+            ALTER TABLE "ReceiptPhoto" ADD CONSTRAINT "ReceiptPhoto_transactionId_fkey"
+            FOREIGN KEY ("transactionId") REFERENCES "Transaction"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
       `)

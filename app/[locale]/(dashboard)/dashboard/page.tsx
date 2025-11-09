@@ -15,7 +15,8 @@ import { MonthlyLimitCard } from "@/components/monthly-limit-card"
 import { QuickEntryButtons } from "@/components/quick-entry-buttons"
 import { FavoriteTransactions } from "@/components/favorite-transactions"
 import { SpendingInsights } from "@/components/spending-insights"
-import { startOfWeek, endOfWeek, getDay, format } from "date-fns"
+import { SpendingCalendar } from "@/components/spending-calendar"
+import { startOfWeek, endOfWeek, getDay, format, startOfMonth as startOfMonthFn, endOfMonth as endOfMonthFn } from "date-fns"
 
 export default async function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
   const session = await getServerSession(authOptions)
@@ -182,6 +183,28 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
     avgDailySpending,
   }
 
+  // Calculate daily spending for calendar
+  const monthStartCal = startOfMonthFn(now)
+  const monthEndCal = endOfMonthFn(now)
+  const monthTransactions = await db.transaction.findMany({
+    where: {
+      userId: session.user.id,
+      type: 'expense',
+      date: { gte: monthStartCal, lte: monthEndCal },
+    },
+  })
+
+  const dailySpendingMap: Record<string, number> = {}
+  monthTransactions.forEach(t => {
+    const dateStr = format(new Date(t.date), 'yyyy-MM-dd')
+    dailySpendingMap[dateStr] = (dailySpendingMap[dateStr] || 0) + t.amount
+  })
+
+  const calendarData = Object.entries(dailySpendingMap).map(([date, amount]) => ({
+    date,
+    amount,
+  }))
+
   return (
     <div className="space-y-8">
       <div>
@@ -202,6 +225,9 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
 
       {/* Spending Insights */}
       <SpendingInsights data={insightsData} locale={locale} />
+
+      {/* Spending Calendar */}
+      <SpendingCalendar data={calendarData} dailyLimit={5000} locale={locale} />
 
       {/* Spending Limit Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
