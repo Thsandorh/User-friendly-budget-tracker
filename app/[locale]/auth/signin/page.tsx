@@ -22,7 +22,9 @@ import {
   CheckCircle2,
   Calendar,
   Shield,
-  Zap
+  Zap,
+  Download,
+  Globe
 } from "lucide-react"
 
 export default function SignInPage({ params: { locale } }: { params: { locale: string } }) {
@@ -143,6 +145,34 @@ export default function SignInPage({ params: { locale } }: { params: { locale: s
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
+      {/* Language Selector */}
+      <div className="container mx-auto px-4 pt-4">
+        <div className="flex justify-end gap-2">
+          <Link
+            href="/en/auth/signin"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              locale === 'en'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800'
+            }`}
+          >
+            <Globe className="h-4 w-4" />
+            <span className="text-sm font-medium">EN</span>
+          </Link>
+          <Link
+            href="/hu/auth/signin"
+            className={`flex items-center gap-2 px-3 py-2 rounded-lg transition-colors ${
+              locale === 'hu'
+                ? 'bg-primary text-primary-foreground'
+                : 'bg-white/50 dark:bg-gray-800/50 hover:bg-white dark:hover:bg-gray-800'
+            }`}
+          >
+            <Globe className="h-4 w-4" />
+            <span className="text-sm font-medium">HU</span>
+          </Link>
+        </div>
+      </div>
+
       <div className="container mx-auto px-4 py-8">
         <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[calc(100vh-4rem)]">
 
@@ -213,6 +243,28 @@ export default function SignInPage({ params: { locale } }: { params: { locale: s
                 <div className="text-sm text-muted-foreground">{locale === 'hu' ? 'Hozzáférés' : 'Access'}</div>
               </div>
             </div>
+
+            {/* Android APK Download */}
+            <div className="pt-4">
+              <a
+                href="https://github.com/Thsandorh/User-friendly-budget-tracker/releases/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-3 px-6 py-4 bg-gradient-to-r from-green-600 to-emerald-600 text-white rounded-lg font-semibold hover:from-green-700 hover:to-emerald-700 transition-all shadow-lg hover:shadow-xl"
+              >
+                <Download className="h-5 w-5" />
+                <span>
+                  {locale === 'hu'
+                    ? 'Android APK letöltése'
+                    : 'Download Android APK'}
+                </span>
+              </a>
+              <p className="text-xs text-center text-muted-foreground mt-2">
+                {locale === 'hu'
+                  ? 'Töltsd le az alkalmazást közvetlenül GitHub-ról'
+                  : 'Download the app directly from GitHub'}
+              </p>
+            </div>
           </div>
 
           {/* Right side - Auth Forms */}
@@ -230,10 +282,12 @@ export default function SignInPage({ params: { locale } }: { params: { locale: s
               </CardHeader>
 
               <Tabs defaultValue="signin" className="w-full" onValueChange={(v) => setIsSignUp(v === 'signup')}>
-                <TabsList className="grid w-full grid-cols-2 mx-6">
-                  <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
-                  <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
-                </TabsList>
+                <CardContent className="pt-6 pb-0">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="signin">{t("auth.signIn")}</TabsTrigger>
+                    <TabsTrigger value="signup">{t("auth.signUp")}</TabsTrigger>
+                  </TabsList>
+                </CardContent>
 
                 <form onSubmit={onSubmit}>
                   <TabsContent value="signin">
