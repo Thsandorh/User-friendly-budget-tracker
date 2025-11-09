@@ -31,6 +31,8 @@ model User {
   budgetTemplates       BudgetTemplate[]
   categorizationRules   CategorizationRule[]
   dailyLimits           DailyLimit[]
+  weeklyLimits          WeeklyLimit[]
+  monthlyLimits         MonthlyLimit[]
 }
 
 // Budget model - users can have multiple budgets
@@ -250,4 +252,38 @@ model DailyLimit {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([userId, date]) // One limit per user per day
+}
+
+// Weekly Limit - set weekly spending limits
+model WeeklyLimit {
+  id        String   @id @default(cuid())
+  amount    Float // Weekly spending limit
+  currency  String   @default("HUF")
+  weekStart DateTime @default(now()) // Start of the week this limit applies to
+  isActive  Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart]) // One limit per user per week
+}
+
+// Monthly Limit - set monthly spending limits
+model MonthlyLimit {
+  id          String   @id @default(cuid())
+  amount      Float // Monthly spending limit
+  currency    String   @default("HUF")
+  monthStart  DateTime @default(now()) // Start of the month this limit applies to
+  isActive    Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, monthStart]) // One limit per user per month
 }

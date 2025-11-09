@@ -220,6 +220,46 @@ export async function ensureDatabaseSchema() {
         ON "DailyLimit"("userId", "date")
       `)
 
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "WeeklyLimit" (
+          "id" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'HUF',
+          "weekStart" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "notes" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "WeeklyLimit_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS "WeeklyLimit_userId_weekStart_key"
+        ON "WeeklyLimit"("userId", "weekStart")
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE TABLE IF NOT EXISTS "MonthlyLimit" (
+          "id" TEXT NOT NULL,
+          "amount" DOUBLE PRECISION NOT NULL,
+          "currency" TEXT NOT NULL DEFAULT 'HUF',
+          "monthStart" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "isActive" BOOLEAN NOT NULL DEFAULT true,
+          "notes" TEXT,
+          "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" TIMESTAMP(3) NOT NULL,
+          "userId" TEXT NOT NULL,
+          CONSTRAINT "MonthlyLimit_pkey" PRIMARY KEY ("id")
+        )
+      `)
+
+      await db.$executeRawUnsafe(`
+        CREATE UNIQUE INDEX IF NOT EXISTS "MonthlyLimit_userId_monthStart_key"
+        ON "MonthlyLimit"("userId", "monthStart")
+      `)
+
     // STEP 1: Add new columns FIRST (before foreign keys that reference them)
     await db.$executeRawUnsafe(`
       DO $$
@@ -421,6 +461,26 @@ export async function ensureDatabaseSchema() {
         BEGIN
           IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'DailyLimit_userId_fkey') THEN
             ALTER TABLE "DailyLimit" ADD CONSTRAINT "DailyLimit_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'WeeklyLimit_userId_fkey') THEN
+            ALTER TABLE "WeeklyLimit" ADD CONSTRAINT "WeeklyLimit_userId_fkey"
+            FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+          END IF;
+        END $$
+      `)
+
+      await db.$executeRawUnsafe(`
+        DO $$
+        BEGIN
+          IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'MonthlyLimit_userId_fkey') THEN
+            ALTER TABLE "MonthlyLimit" ADD CONSTRAINT "MonthlyLimit_userId_fkey"
             FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
           END IF;
         END $$
