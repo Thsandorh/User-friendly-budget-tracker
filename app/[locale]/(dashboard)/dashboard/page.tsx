@@ -9,6 +9,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { formatCurrency } from "@/lib/utils"
 import { Wallet, TrendingUp, TrendingDown, DollarSign } from "lucide-react"
 import { BudgetAlerts } from "@/components/budget-alerts"
+import { DailyLimitCard } from "@/components/daily-limit-card"
 
 export default async function DashboardPage({ params: { locale } }: { params: { locale: string } }) {
   const session = await getServerSession(authOptions)
@@ -123,6 +124,9 @@ export default async function DashboardPage({ params: { locale } }: { params: { 
 
       {/* Budget Alerts */}
       <BudgetAlerts alerts={budgetAlerts} locale={locale} />
+
+      {/* Daily Limit Card */}
+      <DailyLimitCard />
 
       {/* Overview cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
