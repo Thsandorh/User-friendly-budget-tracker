@@ -2,6 +2,9 @@
 import { NextResponse } from "next/server"
 import { db } from "@/lib/db"
 
+// Force dynamic rendering - don't pre-render during build
+export const dynamic = 'force-dynamic'
+
 export async function GET() {
   try {
     // Try to query the database
