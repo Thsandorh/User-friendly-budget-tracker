@@ -38,3 +38,15 @@ next-env.d.ts
 # prisma
 prisma/dev.db
 prisma/dev.db-journal
+
+# capacitor
+.capacitor/
+android/build/
+android/.gradle/
+android/.idea/
+android/app/build/
+android/app/release/
+android/local.properties
+ios/App/build/
+ios/App/Pods/
+ios/App/Podfile.lock

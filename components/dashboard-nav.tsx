@@ -12,6 +12,9 @@ import {
   Tags,
   RepeatIcon,
   FileText,
+  Target,
+  Receipt,
+  Tv,
   Settings,
   LogOut,
   Menu,
@@ -67,28 +70,57 @@ export function DashboardNav({ locale }: DashboardNavProps) {
       href: `/${locale}/reports`,
       active: pathname?.startsWith(`/${locale}/reports`),
     },
+    {
+      label: t("goals.title"),
+      icon: Target,
+      href: `/${locale}/goals`,
+      active: pathname?.startsWith(`/${locale}/goals`),
+    },
+    {
+      label: t("bills.title"),
+      icon: Receipt,
+      href: `/${locale}/bills`,
+      active: pathname?.startsWith(`/${locale}/bills`),
+    },
+    {
+      label: t("subscriptions.title"),
+      icon: Tv,
+      href: `/${locale}/subscriptions`,
+      active: pathname?.startsWith(`/${locale}/subscriptions`),
+    },
   ]
 
   return (
     <>
-      {/* Mobile menu button */}
-      <div className="md:hidden fixed top-4 left-4 z-50">
-        <Button
-          variant="outline"
-          size="icon"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
-        </Button>
-      </div>
+      {/* Mobile menu button - only show when sidebar is closed */}
+      {!mobileMenuOpen && (
+        <div className="md:hidden fixed top-4 left-4 z-50">
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setMobileMenuOpen(true)}
+          >
+            <Menu className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
 
       {/* Navigation sidebar */}
       <nav className={cn(
         "fixed left-0 top-0 z-40 h-full w-64 bg-card border-r flex flex-col transition-transform duration-200",
         mobileMenuOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
       )}>
-        <div className="p-6">
+        <div className="p-6 flex items-center justify-between">
           <h2 className="text-2xl font-bold text-primary">{t("common.appName")}</h2>
+          {/* Close button inside sidebar on mobile */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <X className="h-4 w-4" />
+          </Button>
         </div>
 
         <div className="flex-1 px-3 py-2">

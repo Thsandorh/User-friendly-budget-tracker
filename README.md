@@ -1,6 +1,6 @@
-# Budget Tracker - Professional Budget Management Application
+# FinFlow - Professional Finance Management Application
 
-A full-featured budget tracking web application built with Next.js 14, TypeScript, and Prisma. Track your income, expenses, budgets, and financial goals with ease. Available in both Hungarian and English.
+A full-featured finance management web application built with Next.js 14, TypeScript, and Prisma. Track your income, expenses, budgets, and financial goals with ease. Available in both Hungarian and English.
 
 ## Features
 
@@ -11,13 +11,26 @@ A full-featured budget tracking web application built with Next.js 14, TypeScrip
 - 🏷️ Category management with custom icons and colors
 - 📊 Dashboard with financial overview and analytics
 - 🔄 Recurring transactions (daily, weekly, monthly, yearly)
-- 📈 Advanced reports with interactive charts
+- 📈 Advanced reports with interactive charts (Donut, Bar, Area, Radial, Composed)
 - 📥 Data export (CSV and PDF)
+- 🔍 Transaction search and filtering
+- 📊 Budget alerts (80% warning, 100% exceeded)
+- 📈 Month-over-month statistics
 - 🌙 Dark mode with theme switching
 - 📱 Progressive Web App (PWA) with offline support
 - 🌍 Multi-language support (Hungarian and English)
 - 📱 Fully responsive design
 - 🎨 Professional UI with Tailwind CSS and shadcn/ui
+
+💎 **Premium Features:**
+- 🎯 **Savings Goals** - Track progress toward financial targets with visual progress bars, deadlines, and quick contributions
+- 📋 **Bill Reminders** - Never miss a payment with due date tracking, overdue alerts, recurring bills, and status management
+- 📺 **Subscription Tracker** - Manage recurring subscriptions with monthly/yearly cost analysis, next billing dates, and savings tips
+- 💎 **Net Worth Tracking** - Track your assets and liabilities for complete financial overview with real-time net worth calculation
+- ✂️ **Split Transactions** - Divide a single transaction across multiple categories with percentage-based allocation
+- 📋 **Budget Templates** - Quick-start with proven strategies (50/30/20 Rule, 70/20/10, Zero-Based Budget) or create custom templates
+- 🤖 **Auto-Categorization** - Set up pattern-matching rules to automatically categorize transactions based on merchant names
+- 📸 **Receipt OCR Scanner** - Upload receipt photos to automatically extract transaction details (merchant, amount, date, items)
 
 ## Tech Stack
 
@@ -283,6 +296,7 @@ npx prisma migrate dev
 
 ## Features Roadmap
 
+### ✅ Implemented Features
 - [x] User authentication
 - [x] Budget management
 - [x] Transaction tracking
@@ -295,9 +309,11 @@ npx prisma migrate dev
 - [x] Data export (CSV, PDF)
 - [x] Dark mode
 - [x] Progressive Web App (PWA)
-- [x] Budget alerts and notifications
-- [x] Email notifications
-- [x] Mobile app companion
+
+### 🔮 Future Enhancements
+- [ ] Budget alerts and notifications
+- [ ] Email notifications
+- [ ] Mobile app companion (native iOS/Android)
 
 ## Contributing
 
@@ -317,3 +333,4 @@ For issues and questions, please open an issue on GitHub.
 - UI components from [shadcn/ui](https://ui.shadcn.com/)
 - Icons from [Lucide](https://lucide.dev/)
 - Styled with [Tailwind CSS](https://tailwindcss.com/)
+- 

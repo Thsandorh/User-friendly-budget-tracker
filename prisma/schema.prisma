@@ -12,35 +12,48 @@ datasource db {
 
 // User model for authentication
 model User {
-  id            String    @id @default(cuid())
-  email         String    @unique
-  password      String
-  name          String
-  createdAt     DateTime  @default(now())
-  updatedAt     DateTime  @updatedAt
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String
+  name      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   // Relations
-  budgets       Budget[]
-  transactions  Transaction[]
-  categories    Category[]
+  budgets               Budget[]
+  transactions          Transaction[]
+  categories            Category[]
   recurringTransactions RecurringTransaction[]
+  savingsGoals          SavingsGoal[]
+  billReminders         BillReminder[]
+  assets                Asset[]
+  liabilities           Liability[]
+  budgetTemplates       BudgetTemplate[]
+  categorizationRules   CategorizationRule[]
+  dailyLimits           DailyLimit[]
+  weeklyLimits          WeeklyLimit[]
+  monthlyLimits         MonthlyLimit[]
+  transactionTemplates  TransactionTemplate[]
+  notificationSettings  NotificationSettings?
+  savingsChallenges     SavingsChallenge[]
+  quickEntryPresets     QuickEntryPreset[]
 }
 
 // Budget model - users can have multiple budgets
 model Budget {
-  id          String   @id @default(cuid())
-  name        String
-  amount      Float
-  currency    String   @default("HUF")
-  period      String   // "monthly", "weekly", "yearly"
-  startDate   DateTime
-  endDate     DateTime?
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String    @id @default(cuid())
+  name      String
+  amount    Float
+  currency  String    @default("HUF")
+  period    String // "monthly", "weekly", "yearly"
+  startDate DateTime
+  endDate   DateTime?
+  isActive  Boolean   @default(true)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   // Relations
   transactions Transaction[]
@@ -53,20 +66,22 @@ model Category {
   name        String
   icon        String   @default("📁")
   color       String   @default("#3b82f6")
-  type        String   // "expense" or "income"
-  budgetLimit Float?   // Optional budget limit for this category
+  type        String // "expense" or "income"
+  budgetLimit Float? // Optional budget limit for this category
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  budgetId    String?
-  budget      Budget?  @relation(fields: [budgetId], references: [id], onDelete: Cascade)
+  budgetId String?
+  budget   Budget? @relation(fields: [budgetId], references: [id], onDelete: Cascade)
 
   // Relations
-  transactions Transaction[]
+  transactions          Transaction[]
   recurringTransactions RecurringTransaction[]
+  billReminders         BillReminder[]
+  transactionTemplates  TransactionTemplate[]
 }
 
 // Transaction model - income and expenses
@@ -74,48 +89,298 @@ model Transaction {
   id          String   @id @default(cuid())
   amount      Float
   description String
-  type        String   // "income" or "expense"
+  type        String // "income" or "expense"
   date        DateTime
   notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  budgetId    String?
-  budget      Budget?  @relation(fields: [budgetId], references: [id], onDelete: SetNull)
+  budgetId String?
+  budget   Budget? @relation(fields: [budgetId], references: [id], onDelete: SetNull)
 
-  categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
 
   recurringTransactionId String?
   recurringTransaction   RecurringTransaction? @relation(fields: [recurringTransactionId], references: [id], onDelete: SetNull)
+
+  // Split transaction support
+  parentTransactionId String?
+  parentTransaction   Transaction?  @relation("SplitTransactions", fields: [parentTransactionId], references: [id], onDelete: Cascade)
+  splitTransactions   Transaction[] @relation("SplitTransactions")
+  splitPercentage     Float?
+
+  // Receipt photos
+  receiptPhotos ReceiptPhoto[]
+}
+
+// Receipt Photo - store photo attachments for transactions
+model ReceiptPhoto {
+  id            String   @id @default(cuid())
+  url           String // Photo URL (stored in public folder or cloud storage)
+  fileName      String
+  fileSize      Int? // File size in bytes
+  mimeType      String   @default("image/jpeg")
+  uploadedAt    DateTime @default(now())
+
+  transactionId String
+  transaction   Transaction @relation(fields: [transactionId], references: [id], onDelete: Cascade)
 }
 
 // Recurring transaction model for automatic transactions
 model RecurringTransaction {
-  id          String   @id @default(cuid())
-  amount      Float
-  description String
-  type        String   // "income" or "expense"
-  frequency   String   // "daily", "weekly", "monthly", "yearly"
-  startDate   DateTime
-  endDate     DateTime?
-  dayOfMonth  Int?     // For monthly transactions (1-31)
-  dayOfWeek   Int?     // For weekly transactions (0-6)
-  isActive    Boolean  @default(true)
+  id            String    @id @default(cuid())
+  amount        Float
+  description   String
+  type          String // "income" or "expense"
+  frequency     String // "daily", "weekly", "monthly", "yearly"
+  startDate     DateTime
+  endDate       DateTime?
+  dayOfMonth    Int? // For monthly transactions (1-31)
+  dayOfWeek     Int? // For weekly transactions (0-6)
+  isActive      Boolean   @default(true)
   lastProcessed DateTime?
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+
+  // Relations
+  transactions Transaction[]
+}
+
+// Savings Goal model - track savings towards specific goals
+model SavingsGoal {
+  id            String    @id @default(cuid())
+  name          String
+  targetAmount  Float
+  currentAmount Float     @default(0)
+  currency      String    @default("HUF")
+  deadline      DateTime?
+  icon          String    @default("🎯")
+  color         String    @default("#10b981")
+  isCompleted   Boolean   @default(false)
+  notes         String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Bill Reminder model - track upcoming bills and payment reminders
+model BillReminder {
+  id          String   @id @default(cuid())
+  name        String
+  amount      Float
+  currency    String   @default("HUF")
+  dueDate     DateTime
+  isPaid      Boolean  @default(false)
+  isRecurring Boolean  @default(false)
+  frequency   String? // "monthly", "quarterly", "yearly" if recurring
   notes       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  categoryId  String?
-  category    Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
 
-  // Relations
-  transactions Transaction[]
+// Asset model - track assets (bank accounts, property, investments, etc.)
+model Asset {
+  id        String   @id @default(cuid())
+  name      String
+  type      String // "cash", "bank", "investment", "property", "vehicle", "other"
+  value     Float
+  currency  String   @default("HUF")
+  icon      String   @default("💰")
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Liability model - track liabilities (loans, credit cards, mortgages, etc.)
+model Liability {
+  id           String   @id @default(cuid())
+  name         String
+  type         String // "loan", "mortgage", "credit_card", "other"
+  balance      Float
+  currency     String   @default("HUF")
+  interestRate Float?
+  icon         String   @default("💳")
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Budget Template - predefined budget templates (50/30/20 rule, etc.)
+model BudgetTemplate {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  categories  Json // Array of {category, percentage}
+  isPublic    Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Categorization Rule - auto-categorize transactions based on patterns
+model CategorizationRule {
+  id         String   @id @default(cuid())
+  pattern    String // Text pattern to match in description
+  categoryId String
+  priority   Int      @default(0)
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Daily Limit - set daily spending limits
+model DailyLimit {
+  id        String   @id @default(cuid())
+  amount    Float // Daily spending limit
+  currency  String   @default("HUF")
+  date      DateTime @default(now()) // Which day this limit applies to
+  isActive  Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, date]) // One limit per user per day
+}
+
+// Weekly Limit - set weekly spending limits
+model WeeklyLimit {
+  id        String   @id @default(cuid())
+  amount    Float // Weekly spending limit
+  currency  String   @default("HUF")
+  weekStart DateTime @default(now()) // Start of the week this limit applies to
+  isActive  Boolean  @default(true)
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, weekStart]) // One limit per user per week
+}
+
+// Monthly Limit - set monthly spending limits
+model MonthlyLimit {
+  id          String   @id @default(cuid())
+  amount      Float // Monthly spending limit
+  currency    String   @default("HUF")
+  monthStart  DateTime @default(now()) // Start of the month this limit applies to
+  isActive    Boolean  @default(true)
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, monthStart]) // One limit per user per month
+}
+
+// Transaction Template - save favorite/frequent transactions as templates
+model TransactionTemplate {
+  id          String   @id @default(cuid())
+  name        String // Template name (e.g., "Morning Coffee", "Weekly Groceries")
+  amount      Float // Default amount
+  description String // Transaction description
+  type        String // "income" or "expense"
+  icon        String   @default("⭐") // Emoji icon for the template
+  color       String   @default("#3b82f6") // Color for visual identification
+  isActive    Boolean  @default(true)
+  useCount    Int      @default(0) // Track how many times this template was used
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  categoryId String?
+  category   Category? @relation(fields: [categoryId], references: [id], onDelete: SetNull)
+}
+
+// Notification Settings - user preferences for notifications
+model NotificationSettings {
+  id                    String   @id @default(cuid())
+  dailySummary          Boolean  @default(true)
+  dailySummaryTime      String   @default("20:00")
+  weeklySummary         Boolean  @default(true)
+  limitWarning          Boolean  @default(true)
+  budgetExceeded        Boolean  @default(true)
+  emailNotifications    Boolean  @default(false)
+  pushNotifications     Boolean  @default(true)
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Savings Challenge - gamification for savings
+model SavingsChallenge {
+  id            String   @id @default(cuid())
+  name          String
+  description   String
+  targetAmount  Float
+  currentAmount Float    @default(0)
+  startDate     DateTime @default(now())
+  endDate       DateTime
+  isCompleted   Boolean  @default(false)
+  reward        String? // Reward text for completion
+  icon          String   @default("🏆")
+  color         String   @default("#10b981")
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// Quick Entry Preset - customizable quick entry buttons
+model QuickEntryPreset {
+  id          String   @id @default(cuid())
+  name        String // Display name
+  nameHu      String // Hungarian name
+  amount      Float // Default amount
+  icon        String   @default("⚡") // Emoji icon
+  sortOrder   Int      @default(0) // Display order
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sortOrder])
 }

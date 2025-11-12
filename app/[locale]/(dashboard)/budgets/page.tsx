@@ -9,6 +9,9 @@ import { Plus } from "lucide-react"
 import { formatCurrency, formatDateShort } from "@/lib/utils"
 import { BudgetDialog } from "@/components/budget-dialog"
 import { useToast } from "@/components/ui/use-toast"
+import { DailyLimitCard } from "@/components/daily-limit-card"
+import { WeeklyLimitCard } from "@/components/weekly-limit-card"
+import { MonthlyLimitCard } from "@/components/monthly-limit-card"
 
 export default function BudgetsPage({ params: { locale } }: { params: { locale: string } }) {
   const t = useTranslations()
@@ -67,17 +70,30 @@ export default function BudgetsPage({ params: { locale } }: { params: { locale: 
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t("budgets.title")}</h1>
           <p className="text-muted-foreground">Manage your budgets</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
+        <Button onClick={() => setIsDialogOpen(true)} className="w-full sm:w-auto">
           <Plus className="mr-2 h-4 w-4" />
           {t("budgets.addBudget")}
         </Button>
       </div>
 
+      {/* Spending Limit Cards */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">{locale === 'hu' ? 'Költési Limitek' : 'Spending Limits'}</h2>
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <DailyLimitCard />
+          <WeeklyLimitCard />
+          <MonthlyLimitCard />
+        </div>
+      </div>
+
+      {/* Budget List */}
+      <div>
+        <h2 className="text-xl font-semibold mb-4">{locale === 'hu' ? 'Költségvetések' : 'Budgets'}</h2>
       {budgets.length === 0 ? (
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
@@ -125,6 +141,7 @@ export default function BudgetsPage({ params: { locale } }: { params: { locale: 
           ))}
         </div>
       )}
+      </div>
 
       <BudgetDialog
         open={isDialogOpen}

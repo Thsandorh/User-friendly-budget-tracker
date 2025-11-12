@@ -5,9 +5,11 @@ import { useEffect, useState } from "react"
 import { useTranslations } from "next-intl"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { Plus, Filter } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Plus, Filter, Search, Camera } from "lucide-react"
 import { formatCurrency, formatDateShort } from "@/lib/utils"
 import { TransactionDialog } from "@/components/transaction-dialog"
+import { ReceiptScanner } from "@/components/receipt-scanner"
 import { useToast } from "@/components/ui/use-toast"
 import {
   Select,
@@ -24,9 +26,11 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
   const [categories, setCategories] = useState<any[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [isReceiptScannerOpen, setIsReceiptScannerOpen] = useState(false)
   const [editingTransaction, setEditingTransaction] = useState<any>(null)
   const [filterType, setFilterType] = useState<string>("all")
   const [filterCategory, setFilterCategory] = useState<string>("all")
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
   useEffect(() => {
     fetchTransactions()
@@ -90,84 +94,132 @@ export default function TransactionsPage({ params: { locale } }: { params: { loc
     fetchTransactions()
   }
 
+  const handleReceiptScanSuccess = () => {
+    setIsReceiptScannerOpen(false)
+    fetchTransactions()
+  }
+
+  // Filter transactions based on search query
+  const filteredTransactions = transactions.filter(transaction => {
+    if (!searchQuery) return true
+
+    const query = searchQuery.toLowerCase()
+    const description = transaction.description.toLowerCase()
+    const amount = transaction.amount.toString()
+    const notes = transaction.notes?.toLowerCase() || ""
+
+    return description.includes(query) || amount.includes(query) || notes.includes(query)
+  })
+
   if (isLoading) {
     return <div className="flex items-center justify-center h-64">{t("common.loading")}</div>
   }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h1 className="text-3xl font-bold">{t("transactions.title")}</h1>
           <p className="text-muted-foreground">Track your income and expenses</p>
         </div>
-        <Button onClick={() => setIsDialogOpen(true)}>
-          <Plus className="mr-2 h-4 w-4" />
-          {t("transactions.addTransaction")}
-        </Button>
+        <div className="flex gap-2 w-full sm:w-auto">
+          <Button onClick={() => setIsReceiptScannerOpen(!isReceiptScannerOpen)} variant="outline" className="flex-1 sm:flex-none">
+            <Camera className="mr-2 h-4 w-4" />
+            Scan Receipt
+          </Button>
+          <Button onClick={() => setIsDialogOpen(true)} className="flex-1 sm:flex-none">
+            <Plus className="mr-2 h-4 w-4" />
+            {t("transactions.addTransaction")}
+          </Button>
+        </div>
       </div>
 
-      {/* Filters */}
+      {/* Filters and Search */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex gap-4 items-center">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-            <Select value={filterType} onValueChange={setFilterType}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder={t("transactions.filterByType")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("transactions.all")}</SelectItem>
-                <SelectItem value="income">{t("transactions.income")}</SelectItem>
-                <SelectItem value="expense">{t("transactions.expense")}</SelectItem>
-              </SelectContent>
-            </Select>
-            <Select value={filterCategory} onValueChange={setFilterCategory}>
-              <SelectTrigger className="w-[200px]">
-                <SelectValue placeholder={t("transactions.filterByCategory")} />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">{t("transactions.all")}</SelectItem>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+            <div className="flex items-center gap-2 flex-1">
+              <Search className="h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search transactions..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+            <div className="flex gap-2 items-center">
+              <Filter className="h-4 w-4 text-muted-foreground" />
+              <Select value={filterType} onValueChange={setFilterType}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder={t("transactions.filterByType")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("transactions.all")}</SelectItem>
+                  <SelectItem value="income">{t("transactions.income")}</SelectItem>
+                  <SelectItem value="expense">{t("transactions.expense")}</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={filterCategory} onValueChange={setFilterCategory}>
+                <SelectTrigger className="w-[150px]">
+                  <SelectValue placeholder={t("transactions.filterByCategory")} />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t("transactions.all")}</SelectItem>
+                  {categories.map((cat) => (
+                    <SelectItem key={cat.id} value={cat.id}>{cat.icon} {cat.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* Receipt Scanner */}
+      {isReceiptScannerOpen && (
+        <ReceiptScanner
+          categories={categories}
+          onSuccess={handleReceiptScanSuccess}
+        />
+      )}
+
       {/* Transactions list */}
       <Card>
         <CardContent className="pt-6">
-          {transactions.length === 0 ? (
+          {filteredTransactions.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              <p>{t("dashboard.noTransactions")}</p>
-              <p className="text-sm">{t("dashboard.addFirstTransaction")}</p>
+              {transactions.length === 0 ? (
+                <>
+                  <p>{t("dashboard.noTransactions")}</p>
+                  <p className="text-sm">{t("dashboard.addFirstTransaction")}</p>
+                </>
+              ) : (
+                <p>No transactions match your search</p>
+              )}
             </div>
           ) : (
             <div className="space-y-3">
-              {transactions.map((transaction) => (
-                <div key={transaction.id} className="flex items-center justify-between p-4 border rounded-lg hover:bg-accent transition-colors">
-                  <div className="flex items-center gap-4">
-                    <div className={`w-3 h-3 rounded-full ${
+              {filteredTransactions.map((transaction) => (
+                <div key={transaction.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-4 border rounded-lg hover:bg-accent transition-colors">
+                  <div className="flex items-center gap-4 min-w-0 flex-1">
+                    <div className={`w-3 h-3 rounded-full flex-shrink-0 ${
                       transaction.type === 'income' ? 'bg-green-600' : 'bg-red-600'
                     }`} />
-                    <div>
-                      <p className="font-medium">{transaction.description}</p>
-                      <p className="text-sm text-muted-foreground">
+                    <div className="min-w-0 flex-1">
+                      <p className="font-medium truncate">{transaction.description}</p>
+                      <p className="text-sm text-muted-foreground truncate">
                         {transaction.category?.icon} {transaction.category?.name || t("categories.uncategorized")} • {formatDateShort(transaction.date, locale)}
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-4">
-                    <p className={`font-bold ${
+                  <div className="flex items-center justify-between sm:justify-end gap-3 sm:gap-4">
+                    <p className={`font-bold whitespace-nowrap ${
                       transaction.type === 'income' ? 'text-green-600' : 'text-red-600'
                     }`}>
                       {transaction.type === 'income' ? '+' : '-'}
                       {formatCurrency(transaction.amount, "HUF", locale)}
                     </p>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 flex-shrink-0">
                       <Button variant="outline" size="sm" onClick={() => handleEdit(transaction)}>
                         {t("common.edit")}
                       </Button>

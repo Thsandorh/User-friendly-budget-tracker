@@ -2,8 +2,12 @@
 import { NextResponse } from "next/server"
 import { hash } from "bcryptjs"
 import { db } from "@/lib/db"
+import { ensureDatabaseSchema } from "@/lib/auto-migrate"
 
 export async function POST(req: Request) {
+  // Auto-create database tables on first request
+  await ensureDatabaseSchema()
+
   try {
     const { email, password, name } = await req.json()
 
